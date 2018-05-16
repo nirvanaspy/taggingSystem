@@ -2,26 +2,25 @@ import router from './router'
 import store from './store'
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
-/* import { Message } from 'element-ui'*/
-import { getToken, getRoles, setHidden, getHidden } from '@/utils/auth' // 验权
+import { Message } from 'element-ui'
+import { getToken, getRoles, setHidden, getHidden, removeHidden } from '@/utils/auth' // 验权
 import { getCookies } from './main'
 
 const whiteList = ['/login', '/register'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
-  console.log(getHidden())
+  /* console.log(getHidden())*/
   NProgress.start()
-  if (getCookies('username') === 'admin') {
+  /* if (getCookies('username') === 'admin') {
     setHidden('false')
   } else if (getCookies('username')) {
     setHidden('true')
-  }
-  console.log('step1')
+  }*/
   if (getToken()) {
-    if (getCookies('username') === 'admin') {
+  /*  if (getCookies('username') === 'admin') {
       setHidden('false')
     } else if (getCookies('username')) {
       setHidden('true')
-    }
+    }*/
     console.log('step2')
     if (to.path === '/login') {
       next({ path: '/' })
@@ -54,9 +53,7 @@ router.beforeEach((to, from, next) => {
             store.commit('SET_ROLES', getRoles())
             router.addRoutes(store.getters.addRouters)// 动态添加可访问路由表
             console.log(store.getters.addRouters)
-            console.log('1.1')
             next({ ...to, replace: true })// hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
-            console.log('1.2')
           }).catch(() => {
             store.dispatch('FedLogOut').then(() => {
               Message.error('验证失败,请重新登录')

@@ -1,6 +1,8 @@
 import Vue from 'vue'
-
+import 'babel-polyfill'
 import 'normalize.css/normalize.css'// A modern alternative to CSS resets
+import promise from 'es6-promise'
+promise.polyfill()
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'

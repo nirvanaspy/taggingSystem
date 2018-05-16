@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken, setRoles, removeHidden } from '@/utils/auth'
+import { getToken, setToken, removeToken, setRoles, setHidden, removeHidden, getHidden, removeUsername, removePassword } from '@/utils/auth'
 import { getCookies } from '../../main'
 
 const user = {
@@ -29,10 +29,17 @@ const user = {
     // 登录
     Login({ commit }, userInfo) {
       console.log('loginStart')
+      removeHidden()
       const username = userInfo.username.trim()
       console.log(username)
       console.log(userInfo)
       return new Promise((resolve, reject) => {
+        if (username === 'admin') {
+          setHidden('false')
+        } else {
+          setHidden('true')
+        }
+        console.log(getHidden(), 12345)
         login(username, userInfo.password).then(response => {
           console.log('userInfo')
           const data = response.data
@@ -92,9 +99,13 @@ const user = {
     // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
+        console.log('fadeout')
         commit('SET_TOKEN', '')
         removeToken()
         removeHidden()
+        removeUsername()
+        removePassword()
+        console.log('removed')
         resolve()
       })
     }

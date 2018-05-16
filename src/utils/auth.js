@@ -18,6 +18,12 @@ export function getHidden() {
 export function removeHidden() {
   return Cookies.remove('Hiddenflag')
 }
+export function removeUsername() {
+  return Cookies.remove('username')
+}
+export function removePassword() {
+  return Cookies.remove('password')
+}
 export function setToken(token) {
   return Cookies.set(TokenKey, token)
 }
