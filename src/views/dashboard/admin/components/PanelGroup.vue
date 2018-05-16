@@ -1,40 +1,38 @@
 <template>
   <el-row class="panel-group" :gutter="40">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <router-link to="/device/device">
-        <div class='card-panel' @click="handleSetLineChartData('newVisitis')">
-          <div class="card-panel-icon-wrapper icon-computer">
-            <svg-icon icon-class="documentation" class-name="card-panel-icon" />
-          </div>
-          <div class="card-panel-description">
-            <div class="card-panel-text">文章总数</div>
-            <count-to class="card-panel-num" :startVal="0" :endVal="list.all" :duration="2600"></count-to>
-          </div>
+      <div class='card-panel' @click="handleSetLineChartData('newVisitis')">
+        <div class="card-panel-icon-wrapper icon-computer">
+          <svg-icon icon-class="documentation" class-name="card-panel-icon" />
         </div>
-      </router-link>
+        <div class="card-panel-description">
+          <div class="card-panel-text">文章总数</div>
+          <count-to class="card-panel-num" :autoplay= autoplayFlag :startVal="0" :endVal="list.all" :duration="3000"></count-to>
+        </div>
+      </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <router-link to="/components/index">
+      <router-link to="/document/index">
         <div class="card-panel" @click="handleSetLineChartData('messages')">
           <div class="card-panel-icon-wrapper icon-components1">
             <svg-icon icon-class="form" class-name="card-panel-icon" />
           </div>
           <div class="card-panel-description">
             <div class="card-panel-text">已标注</div>
-            <count-to class="card-panel-num" :startVal="0" :endVal="list.marked" :duration="3000"></count-to>
+            <count-to class="card-panel-num" :autoplay= autoplayFlag :startVal="0" :endVal="list.marked" :duration="2600"></count-to>
           </div>
         </div>
       </router-link>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <router-link to="/device/device">
+      <router-link to="/check/index">
         <div class='card-panel' @click="handleSetLineChartData('newVisitis')">
           <div class="card-panel-icon-wrapper icon-computer">
             <svg-icon icon-class="example" class-name="card-panel-icon" />
           </div>
           <div class="card-panel-description">
             <div class="card-panel-text">已审阅</div>
-            <count-to class="card-panel-num" :startVal="0" :endVal="list.reviewed" :duration="2600"></count-to>
+            <count-to class="card-panel-num" :autoplay= autoplayFlag :startVal="0" :endVal="list.reviewed" :duration="2600"></count-to>
           </div>
         </div>
       </router-link>
@@ -66,12 +64,14 @@ export default {
   },
   data() {
     return {
+      autoplayFlag: false,
       tableKey: 0,
       list: [],
       conflictLength: 0
     }
   },
   created() {
+    this.autoplayFlag = false
     this.getList()
     this.getConflictList()
   },
@@ -83,11 +83,13 @@ export default {
       this.listLoading = true
       countList(this.listQuery).then(response => {
         this.list = response.data.data
+        this.autoplayFlag = true
         this.listLoading = false
       })
     },
     getConflictList () {
       conflictList().then(response => {
+        console.log(response.data.data.length)
         this.conflictLength = response.data.data.length
       })
     }
