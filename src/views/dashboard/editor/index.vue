@@ -2,11 +2,10 @@
   <div class="dashboard-editor-container">
     <div class=" clearfix">
       <pan-thumb style="float: left" :image="avatar"> Your roles:
-        <span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
+        <span class="pan-info-roles">{{token}}</span>
       </pan-thumb>
-      <github-corner></github-corner>
       <div class="info-container">
-        <span class="display_name">{{name}}</span>
+        <span class="display_name">{{token}}</span>
         <span style="font-size:20px;padding-top:20px;display:inline-block;">editor : dashboard</span>
       </div>
     </div>
@@ -19,11 +18,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
-import GithubCorner from '@/components/GithubCorner'
 
 export default {
   name: 'dashboard-editor',
-  components: { PanThumb, GithubCorner },
+  components: { PanThumb },
   data() {
     return {
       emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
@@ -33,7 +31,8 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
-      'roles'
+      'roles',
+      'token'
     ])
   }
 }

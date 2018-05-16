@@ -17,8 +17,8 @@
                  icon="el-icon-plus">申请冲突标注
       </el-button>-->
     </div>
-
-    <el-table :key='tableKey' :data="listA.slice((currentPage-1)*pagesize,currentPage*pagesize)" v-loading="listLoading" element-loading-text="请稍等" border fit highlight-current-row
+    <!--:data="listA.slice((currentPage-1)*pagesize,currentPage*pagesize)"-->
+    <el-table :key='tableKey' :data="listA" v-loading="listLoading" element-loading-text="请稍等" border fit highlight-current-row
               style="width: 100%">
 
       <el-table-column label="标题" min-width="100">
@@ -29,17 +29,17 @@
       </el-table-column>
       <el-table-column width="150px" label="类型">
         <template slot-scope="scope">
-          <span>{{scope.row.type}}</span>
+          <span>{{scope.row.documentEntity.type}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" label="标注" prop="marked"
+      <!--<el-table-column width="150px" label="标注" prop="marked"
                        :filters="[{ text: '已标注', value: true }, { text: '未标注', value: false }]"
                        :filter-method="filterTag">
         <template slot-scope="scope">
-          <span class="el-tag el-tag--success" v-if="scope.row.marked">已标注</span>
-          <span class="el-tag el-tag--danger" v-else>未标注</span>
+          <span class="el-tag el-tag&#45;&#45;success" v-if="scope.row.marked">已标注</span>
+          <span class="el-tag el-tag&#45;&#45;danger" v-else>未标注</span>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
     <!--<el-dialog title="申请冲突标注" :visible.sync="dialogFormVisible" width="40%">
       <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px">
@@ -53,7 +53,7 @@
         <el-button type="primary" @click="ApplyDoc">确认</el-button>
       </div>
     </el-dialog>-->
-    <div class="paginationContainer">
+    <!--<div class="paginationContainer">
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -63,7 +63,7 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="listA.length">
       </el-pagination>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -119,11 +119,17 @@
       getList() {
         this.listLoading = true
         conflictList(this.listQuery,this.loginInfo).then(response => {
-          this.list = response.data.data
+          this.list = this.filterList(response.data.data)
           this.total = response.data.total
           this.listLoading = false
           this.oldList = this.list.map(v => v.id);
           this.newList = this.oldList.slice()
+        })
+      },
+      filterList (list) {
+        return list.filter(function (item) {
+          /* console.log(item) */
+          return item.documentEntity.reviewed ===true
         })
       },
       filterTag(value, row) {

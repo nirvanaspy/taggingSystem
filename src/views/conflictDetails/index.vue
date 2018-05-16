@@ -1,8 +1,9 @@
 <template>
   <div class="app-container calendar-list-container" style="height: 100%">
-    <div class="btnContainer" id="btnContainer">
-      <el-button type="success" v-if="!reviewed" @click="commitTags" style="float: right">提交</el-button>
-      <el-button type="success" v-else plain style="float: right" disabled="disabled">已提交</el-button>
+    <div class="btnContainer" id="btnContainer" style="position:relative;height:40px;">
+      <!--<el-button type="success" :loading="commitLoading" v-if="!reviewed" @click="commitTags" style="float: right">提交</el-button>
+      <el-button type="success" v-else plain style="float: right" disabled="disabled">已提交</el-button>-->
+      <router-link to="/conflict/index"><el-button type="success" style="position:absolute;right:0;">返回</el-button></router-link>
     </div>
     <div class="articleContainer" style="width:68%;float:left;overflow:hidden;padding:6px 20px 6px 6px;text-align: justify">
       <h3 style="position:relative;margin:0;padding-right:60px;">
@@ -37,7 +38,7 @@
             </el-input>
           </div>
           <div class="btnContainer" style="margin:10px 0;height:40px" v-if="item.conflict">
-            <el-button type="danger" style="float:right;" @click="resolveMarkConflict(item.id,item.answer)">撤销</el-button>
+            <el-button type="danger" style="float:right;" :loading="resolveLoading" @click="resolveMarkConflict(item.id,item.answer)">撤销</el-button>
             <!--<el-button type="primary" style="float:right;margin-right:10px">修改</el-button>-->
             <!--<el-button type="warning" v-if="!item.conflict" style="float:right;" @click="setConflict(item.id)">撤销</el-button>
             <el-button type="warning" v-else disabled="disabled" style="float:right;" @click="setConflict(item.id)">修改</el-button>-->
@@ -126,7 +127,9 @@
           username: '',
           password: ''
         },
-        loadingTag:true
+        loadingTag:true,
+        resolveLoading: false,
+        commitLoading: false
       }
     },
     created() {
@@ -135,19 +138,15 @@
       this.loginInfo.username = this.getCookie('username')
       this.loginInfo.password = this.getCookie('password')
       this.id = this.$route.params.id
-      console.log(this.id)
       this.cId = this.$route.params.cId
-      console.log(this.cId, 'cId')
       this.getdocument()
       if (this.getCookie('pfontSize')) {
         this.pFontSize = this.getCookie('pfontSize')
-        console.log(this.pFontSize)
       }
     },
     mounted () {
       this.$nextTick(() => {
         let pWords = document.getElementById('articleT')
-        console.log(pWords)
         pWords.style['font-size'] = this.pFontSize + 'px'
         this.tagContainer = document.getElementById('tagContainer')
         this.pContainer = document.getElementById('articleT')
@@ -216,20 +215,28 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          this.commitLoading = true
           commitReview(this.id, this.loginInfo).then(response => {
             this.$message({
               message: '提交成功',
               type: 'success'
             });
+            this.commitLoading = false
             this.$router.replace('/check/index')
+          }).catch(() => {
+            this.commitLoading = false
           })
         })
       },
       resolveMarkConflict (mId, answers) {
+        this.resolveLoading = true
         console.log(this.cId,'thiscid')
         resolveConflicts(this.cId, mId, answers).then(() => {
           this.getdocument()
+          this.resolveLoading = false
           console.log('resolvesuccess')
+        }).catch(() => {
+          this.resolveLoading = false
         })
       },
       setFontSize (x) {

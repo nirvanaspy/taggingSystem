@@ -43,7 +43,7 @@
     </div>-->
 
     <el-dialog title="申请审阅" :visible.sync="dialogFormVisible" width="40%">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px">
+      <el-form ref="dataForm" :rules="applyRules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="申请数量: " prop="num">
           <el-input v-model="temp.num" style="width: 200px"></el-input>
           <div style="height:20px;color:red;">{{this.errorMessage}}</div>
@@ -52,10 +52,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="ApplyCheck">确认</el-button>
+        <el-button type="primary" :loading="applyLoading" @click="ApplyCheck">确认</el-button>
       </div>
     </el-dialog>
-    <div class="paginationContainer">
+    <!--<div class="paginationContainer">
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -65,7 +65,7 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="listA.length">
       </el-pagination>
-    </div>
+    </div>-->
 
   </div>
 </template>
@@ -73,6 +73,7 @@
 <script>
   import { documentListReview, distributionReviewDoc } from '@/api/reviewDocument.js'
   import waves from '@/directive/waves' // 水波纹指令
+  import { isvalidNum } from '@/utils/validate'
   /* eslint-disable */
   export default {
     name: 'document',
@@ -80,6 +81,13 @@
       waves
     },
     data() {
+      const isvalidNums = (rule, num, callback) => {
+        if (!isvalidNum(num)) {
+          callback(new Error('请输入一个正整数'))
+        } else {
+          callback()
+        }
+      }
       return {
         tableKey: 0,
         list: [],
@@ -103,6 +111,9 @@
           id: '',
           num: ''
         },
+        applyRules: {
+          num: [{required: true,trigger: 'blur',validator: isvalidNums}]
+        },
         loginInfo: {
           username: '',
           password: ''
@@ -111,6 +122,7 @@
         total:0,//默认数据总数
         pagesize:10,//每页的数据条数
         currentPage:1,//默认开始页面
+        applyLoading: false
       }
     },
     created() {
@@ -162,6 +174,7 @@
       ApplyCheck() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.applyLoading = true
             let formData = new FormData();
             formData.append('num', this.temp.num);
 
@@ -169,6 +182,7 @@
             var that = this
             distributionReviewDoc(formData, this.loginInfo).then(response => {
               this.list = response.data.data;
+              this.applyLoading = false
               //console.log(response.data)
               console.log(response.data.data)
               //this.list.unshift(this.temp)
@@ -181,10 +195,13 @@
                 duration: 2000
               })
               this.getList()
-            }).catch(function(error){
-              if(error.response){
-                that.errorMessage = error.response.data.message
+            }).catch((error) => {
+              this.applyLoading = false
+              console.log(3222)
+              if(error.response.data.status === 500){
+                this.errorMessage = error.response.data.message
               }else{
+                this.errorMessage = '请输入正确的数量'
                 console.log('error')
               }
             })

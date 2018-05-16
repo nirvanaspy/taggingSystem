@@ -29,10 +29,15 @@ export function importDocu(data) {
   })
 }
 
-export function outPutDocu(data) {
+export function outputDocu(data) {
   return request({
-    url: '/documents/import',
-    method: 'post',
+    url: '/documents/export',
+    method: 'get',
+    params: {
+      type: data.type,
+      startindex: data.startIndex,
+      endindex: data.endIndex
+    },
     auth: {
       username: 'admin',
       password: 'admin'

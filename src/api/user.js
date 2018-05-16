@@ -29,3 +29,20 @@ export function modifyUser(data) {
     data
   })
 }
+
+export function createUser(data) {
+  return request({
+    url: '/users/creatusers',
+    method: 'post',
+    params: {
+      prefix: data.prefix,
+      num: data.num,
+      isAdmin: data.isAdmin
+    },
+    auth: {
+      username: 'admin',
+      password: 'admin'
+    },
+    data
+  })
+}

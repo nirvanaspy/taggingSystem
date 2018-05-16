@@ -4,9 +4,9 @@
       <el-button @click="addtags">添加标记</el-button>
       <el-button @click="saveAllTags">保存全部</el-button>
     </div>-->
-    <div class="btnContainer" id="btnContainer">
-      <el-button type="success" @click="commitTags" style="float: right" v-if="!this.marked">提交</el-button>
-      <el-button type="success" plain v-else style="float: right" disabled="disabled">已提交</el-button>
+    <div class="btnContainer" id="btnContainer" style="position:relative;height:40px;">
+      <el-button type="success" @click="commitTags" :loading="commitLoading" style="position:absolute;right:0;" v-if="!this.marked">提交</el-button>
+      <el-button type="success" plain v-else disabled="disabled" style="position:absolute;right:0;">已提交</el-button>
     </div>
     <div class="articleContainer" style="width:68%;float:left;overflow:hidden;padding:6px 20px 6px 6px;text-align: justify">
       <h3 style="position:relative;margin:0;padding-right:60px;">
@@ -41,8 +41,8 @@
             </div>
             <div class="btnContainer" style="margin:10px 0;height:40px" v-if="!marked">
               <span style="font-size:14px;float:left;margin-left:28px;padding-top: 10px">类型：{{item.markTypeEntity.name}}</span>
-              <el-button type="danger" style="float:right;" @click="deleteTag(item.id)">删除</el-button>
-              <el-button type="primary" style="float: right;margin-right: 10px;" @click="updateTag(item.id, item)">修改</el-button>
+              <el-button type="danger" :loading="deleteLoading" style="float:right;" @click="deleteTag(item.id)">删除</el-button>
+              <el-button type="primary" :loading="updateLoading" style="float: right;margin-right: 10px;" @click="updateTag(item.id, item)">修改</el-button>
             </div>
           </div>
 
@@ -65,7 +65,7 @@
           </el-input>
         </div>
         <div class="btnContainer" style="margin:10px 0;height:40px">
-          <el-button type="success" @click="saveTags" style="float:right;">保存</el-button>
+          <el-button type="success" @click="saveTags" :loading="saveLoading" style="float:right;">保存</el-button>
           <el-select v-model="value"
                      @change="selectedMarkType()"
                      style="float:right;margin-right:10px;width:208px">
@@ -139,7 +139,12 @@
         },
         markTypeData: null,
         value: '',
-        markTypeId: ''
+        valueDefault:'',
+        markTypeId: '',
+        saveLoading: false,
+        updateLoading: false,
+        deleteLoading: false,
+        commitLoading: false
       }
     },
     created() {
@@ -151,13 +156,11 @@
       this.getMarkType()
       if (this.getCookie('pfontSize')) {
         this.pFontSize = this.getCookie('pfontSize')
-        console.log(this.pFontSize)
       }
     },
     mounted () {
       this.$nextTick(() => {
         let pWords = document.getElementById('articleT')
-        console.log(pWords)
         pWords.style['font-size'] = this.pFontSize + 'px'
         this.tagContainer = document.getElementById('tagContainer')
         this.pContainer = document.getElementById('articleT')
@@ -193,12 +196,17 @@
       getMarkType() {
         markType(this.loginInfo).then((res) => {
           this.markTypeData = res.data.data
-          console.log(res.data)
+          for(var i=0; i<this.markTypeData.length; i++) {
+            if(this.markTypeData[i].name === '默认') {
+              this.valueDefault = this.markTypeData[i].id
+              this.value = this.valueDefault
+              this.markTypeId = this.value
+            }
+          }
         })
       },
       selectedMarkType() {
         this.markTypeId = this.value
-        console.log(this.markTypeId)
       },
       getdocument () {
         this.listLoading = true
@@ -206,8 +214,6 @@
           this.document = response.data.data
           this.marked= this.document.marked
           this.markList = response.data.data.markEntityList
-          console.log(this.markList)
-          console.log(this.document)
           this.loading = false
         })
       },
@@ -224,6 +230,7 @@
       addtags () {
       },
       saveTags () {
+        this.saveLoading = true
         this.markdata =
           {
             question: this.input1.question,
@@ -231,36 +238,43 @@
             markType: this.markTypeId
           }
         markdocument(this.id, this.markdata, this.loginInfo).then(response => {
-          console.log(response.data)
           this.input1.question = ''
           this.input1.answer = ''
-          this.markTypeId = ''
-          this.value = ''
+          this.markTypeId = this.valueDefault
+          this.value = this.valueDefault
+          this.saveLoading = false
           this.markdata = {}
           this.getdocument()
+        }).catch(() => {
+          this.saveLoading = false
         })
       },
       saveAllTags () {
         let questions = document.getElementsByClassName('questionContainer')
-        console.log(questions)
       },
       updateTag(id, item) {
-        console.log(item.question)
+        this.updateLoading = true
         updateMark(id, item, this.loginInfo).then(response => {
+          this.updateLoading = false
           this.$notify({
             title: '成功',
             message: '修改成功',
             type: 'success',
             duration: 2000
           })
-          console.log('updateSuccess')
+        }).catch(() => {
+          this.updateLoading = false
         })
       },
       deleteTag (markId) {
+        this.deleteLoading = true
         let documentId = this.id
         deleteMark(documentId, markId, this.loginInfo).then(response => {
+          this.deleteLoading = false
           this.getdocument()
           console.log('deleteSuccess')
+        }).catch(() => {
+          this.deleteLoading = false
         })
       },
       commitTags() {
@@ -271,19 +285,22 @@
           console.log(this.tagName[i].value);
         }*/
 
-        console.log(this.markList.length)
         if(this.markList.length >= 5){
           this.$confirm('确认提交标注结果吗?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+            this.commitLoading = true
             commitdocument(this.id, this.loginInfo).then(response => {
+              this.commitLoading = false
               this.$message({
                 message: '提交成功',
                 type: 'success'
               });
               this.$router.replace('/document/index')
+            }).catch(() => {
+              this.commitLoading = false
             })
           })
         }else{

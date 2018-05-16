@@ -54,18 +54,17 @@
       </el-table-column>
     </el-table>
     <el-dialog title="申请标注" :visible.sync="dialogFormVisible" width="40%">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px">
+      <el-form ref="dataForm" :rules="applyRules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="申请数量: " prop="num">
           <el-input v-model="temp.num" style="width: 200px"></el-input>
         </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="ApplyDoc">确认</el-button>
+        <el-button type="primary" @click="ApplyDoc" :loading="applyLoading">确认</el-button>
       </div>
     </el-dialog>
-    <div class="paginationContainer">
+    <!--<div class="paginationContainer">
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -75,7 +74,7 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="listA.length">
       </el-pagination>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -83,6 +82,7 @@
   import { documentList, docDistribution } from '@/api/tagdocument'
   import { markType, addMarkType, delMarkType } from '../../api/markType'
   import waves from '@/directive/waves' // 水波纹指令
+  import { isvalidNum } from '@/utils/validate'
   /* eslint-disable */
   export default {
     name: 'document',
@@ -90,6 +90,13 @@
       waves
     },
     data() {
+      const isvalidNums = (rule, num, callback) => {
+        if (!isvalidNum(num)) {
+          callback(new Error('请输入一个正整数'))
+        } else {
+          callback()
+        }
+      }
       return {
         tableKey: 0,
         list: [],
@@ -113,6 +120,9 @@
           id: '',
           num: ''
         },
+        applyRules: {
+          endIndex: [{required: true,trigger: 'blur',validator: isvalidNums}]
+        },
         loginInfo: {
           username: '',
           password: ''
@@ -124,7 +134,8 @@
         markTypeData: null,
         markTypeId: '',
         markTypeName: '',
-        selectId: false
+        selectId: false,
+        applyLoading: false
       }
     },
     created() {
@@ -137,13 +148,10 @@
       getMarkType() {
         markType(this.loginInfo).then((res) => {
           this.markTypeData = res.data.data
-          console.log(res.data,1111)
         })
       },
       selectedMarkType () {
-        console.log('valuechange')
         this.markTypeName = this.value
-        console.log(this.markTypeId)
         let isExisted = false
         this.selectId = false
         for(let i=0;i<this.markTypeData.length;i++){
@@ -192,8 +200,6 @@
         })
       },
       filterTag(value, row) {
-        console.log(row.marked);
-        console.log(value);
         return row.marked === value;
       },
       handleSizeChange(val) {
@@ -216,7 +222,6 @@
         this.resetTemp();
         this.dialogStatus = 'create'
         this.dialogFormVisible = true
-
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
           // this.getList()
@@ -225,17 +230,13 @@
       ApplyDoc() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.applyLoading = true
             let formData = new FormData();
             formData.append('num', this.temp.num);
-
-            //console.log(formData);
-
             docDistribution(formData, this.loginInfo).then(response => {
-
               this.list = response.data.data;
-              //console.log(response.data)
-              console.log(response.data.data)
               //this.list.unshift(this.temp)
+              this.applyLoading = true
               this.dialogFormVisible = false
               this.listLoading = false
               this.$notify({
@@ -248,7 +249,10 @@
               this.getList()
 
 
+            }).catch(() => {
+              this.applyLoading = false
             })
+
           }
         })
       },

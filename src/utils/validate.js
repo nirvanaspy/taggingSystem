@@ -29,4 +29,15 @@ export function validatAlphabets(str) {
   const reg = /^[A-Za-z]+$/
   return reg.test(str)
 }
+// 不能输入为空
+export function isvalidInput(str) {
+  return str.length > 0
+}
+
+// 输入一个正整数
+export function isvalidNum(num) {
+  /* const reg = /^[0-9]*[1-9][0-9]*$/*/
+  const reg = /^[1-9]\d*$/
+  return reg.test(num)
+}
 

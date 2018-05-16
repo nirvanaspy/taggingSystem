@@ -1,8 +1,8 @@
 <template>
   <div class="app-container calendar-list-container" style="height: 100%">
-    <div class="btnContainer" id="btnContainer">
-      <el-button type="success" v-if="!reviewed" @click="commitTags" style="float: right">提交</el-button>
-      <el-button type="success" v-else plain style="float: right" disabled="disabled">已提交</el-button>
+    <div class="btnContainer" id="btnContainer" style="position:relative;height:40px;">
+      <el-button type="success" v-if="!reviewed" @click="commitTags" :loading="commitLoading" style="position:absolute;right:0;">提交</el-button>
+      <el-button type="success" v-else plain style="position:absolute;right:0;" disabled="disabled">已提交</el-button>
     </div>
     <div class="articleContainer" style="width:68%;float:left;overflow:hidden;padding:6px 20px 6px 6px;text-align: justify">
       <h3 style="position:relative;margin:0;padding-right:60px;">
@@ -36,8 +36,8 @@
             </el-input>
           </div>
           <div class="btnContainer" style="margin:10px 0;height:40px" v-if="!reviewed">
-            <el-button type="warning" v-if="!item.conflict" style="float:right;" @click="setConflict(item.id)">冲突</el-button>
-            <el-button type="warning" v-else disabled="disabled" style="float:right;" @click="setConflict(item.id)">已提交</el-button>
+            <el-button type="warning" v-if="!item.conflict" style="float:right;" :loading="conflictLoading" @click="setConflict(item.id)">冲突</el-button>
+            <el-button type="warning" v-else disabled="disabled" style="float:right;">已提交</el-button>
           </div>
           <div>
             <br/>
@@ -124,7 +124,9 @@
           username: '',
           password: ''
         },
-        loadingTag:true
+        loadingTag:true,
+        conflictLoading: false,
+        commitLoading: false
       }
     },
     created() {
@@ -136,13 +138,11 @@
       this.getdocument()
       if (this.getCookie('pfontSize')) {
         this.pFontSize = this.getCookie('pfontSize')
-        console.log(this.pFontSize)
       }
     },
     mounted () {
       this.$nextTick(() => {
         let pWords = document.getElementById('articleT')
-        console.log(pWords)
         pWords.style['font-size'] = this.pFontSize + 'px'
         this.tagContainer = document.getElementById('tagContainer')
         this.pContainer = document.getElementById('articleT')
@@ -183,8 +183,6 @@
           this.reviewed = this.document.reviewed
           this.markList = response.data.data.markEntityList
           this.loadingTag = false
-          console.log(this.markList)
-          console.log(this.document)
           this.loading = false
         })
       },
@@ -200,9 +198,13 @@
       },
       setConflict (markId) {
         let documentId = this.id
+        this.conflictLoading = true
         markConflict(documentId, markId, this.loginInfo).then(response => {
+          this.conflictLoading = false
           this.getdocument()
           console.log('deleteSuccess')
+        }).catch(() => {
+          this.conflictLoading = false
         })
       },
       commitTags() {
@@ -211,12 +213,16 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          this.commitLoading = true
           commitReview(this.id, this.loginInfo).then(response => {
+            this.commitLoading = false
             this.$message({
               message: '提交成功',
               type: 'success'
             });
             this.$router.replace('/check/index')
+          }).catch(() => {
+            this.commitLoading = false
           })
         })
 
