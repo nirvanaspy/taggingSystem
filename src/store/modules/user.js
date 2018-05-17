@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken, setRoles, setHidden, removeHidden, getHidden, removeUsername, removePassword } from '@/utils/auth'
+import { getToken, setToken, removeToken, setRoles, setUserId, removeUserId, setHidden, removeHidden, getHidden, removeUsername, removePassword } from '@/utils/auth'
 import { getCookies } from '../../main'
 
 const user = {
@@ -43,8 +43,11 @@ const user = {
         login(username, userInfo.password).then(response => {
           console.log('userInfo')
           const data = response.data
+          console.log(data)
           /* setToken(data.token) */
           setToken(data.username)
+          setUserId(data.data.id)
+          console.log(data.data.id)
           commit('SET_TOKEN', data.username)
           /* if (username === 'admin') {
             commit('SET_ROLES', 'admin')
@@ -105,6 +108,7 @@ const user = {
         removeHidden()
         removeUsername()
         removePassword()
+        removeUserId()
         console.log('removed')
         resolve()
       })

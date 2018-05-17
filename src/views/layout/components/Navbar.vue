@@ -36,9 +36,9 @@
           <el-dropdown-item v-if="token === 'admin'" style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="creatUserVisible = true">生成用户</span>
           </el-dropdown-item>
-          <!-- <el-dropdown-item divided>
-             <span @click="dialogFormVisible = true" style="display:block;">修改密码</span>
-           </el-dropdown-item>-->
+          <el-dropdown-item v-if="token !== 'admin'" style="padding:0">
+            <span style="display:block;padding: 0 15px;" @click="dialogFormVisible = true">修改密码</span>
+          </el-dropdown-item>
           <el-dropdown-item style="padding:0">
             <span @click="logout" style="display:block;padding: 0 15px;">退出登录</span>
           </el-dropdown-item>
@@ -91,23 +91,23 @@
             <el-button type="primary" @click="handleCreat" :loading="createUserLoading">确 定</el-button>
           </div>
         </el-dialog>
-        <!--<el-dialog title="修改密码" :visible.sync="dialogFormVisible">
-          <el-form :model="form" style="width: 400px; margin-left:50px;">
-            <el-form-item label="原密码" :label-width="formLabelWidth">
-              <el-input type="password" v-model="form.passwordOld" auto-complete="off"></el-input>
+        <el-dialog title="修改密码" :visible.sync="dialogFormVisible">
+          <el-form :rules="changePasswordRules" :model="modifyPasswordForm" ref="modifyUserForm" style="width: 400px; margin-left:50px;">
+            <el-form-item label="原密码" :label-width="formLabelWidth" prop="passwordOld">
+              <el-input type="password" v-model="modifyPasswordForm.passwordOld" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="新密码" :label-width="formLabelWidth">
-              <el-input type="password" v-model="form.passwordNew" auto-complete="off"></el-input>
+            <el-form-item label="新密码" :label-width="formLabelWidth" prop="passwordNew">
+              <el-input type="password" v-model="modifyPasswordForm.passwordNew" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="再次输入密码" :label-width="formLabelWidth">
-              <el-input type="password" v-model="form.passwordNew" auto-complete="off"></el-input>
+            <el-form-item label="再次输入" :label-width="formLabelWidth" prop="passwordAgain">
+              <el-input type="password" v-model="modifyPasswordForm.passwordAgain" auto-complete="off"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="handleUpdate">确 定</el-button>
+            <el-button @click="resetChangePswForm('modifyUserForm')">取 消</el-button>
+            <el-button type="primary" @click="handleUpdate" :loading="changePasswordLoading">确 定</el-button>
           </div>
-        </el-dialog>-->
+        </el-dialog>
       </el-dropdown>
     </el-menu>
   </div>
@@ -118,8 +118,9 @@ import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import { importDocu, outputDocu } from '@/api/tagdocument'
-import { createUser } from '@/api/user'
-import { isvalidInput, isvalidNum } from '@/utils/validate'
+import { createUser, changePassword } from '@/api/user'
+import { isvalidInput, isvalidNum, isvalidPassword } from '@/utils/validate'
+import { getUserId, getPsw } from '@/utils/auth'
 /* import { Loading } from 'element-ui'*/
 
 /* eslint-disable */
@@ -132,6 +133,27 @@ export default {
         callback()
       }
     }*/
+    const validPswOld = (rule, value, callback) => {
+      if(this.pswOld !== this.modifyPasswordForm.passwordOld) {
+        callback(new Error('原密码不正确，请重新输入！'))
+      } else {
+        callback()
+      }
+    }
+    const validPswNew = (rule, value, callback) => {
+      if (!isvalidPassword(value)) {
+        callback(new Error('新密码必须是大小英文字母和数字混合，至少六位'))
+      } else {
+        callback()
+      }
+    }
+    const validPswAgain = (rule, value, callback) => {
+      if(this.modifyPasswordForm.passwordAgain !== this.modifyPasswordForm.passwordNew) {
+        callback(new Error('两次密码输入不一致，请再次输入新密码！'))
+      } else {
+        callback()
+      }
+    }
     const isvalidSelect = (rule, value, callback) => {
       if (!isvalidInput(value)) {
         callback(new Error('请选择一个分类'))
@@ -154,6 +176,7 @@ export default {
       }
     }
     return {
+      userId: '',
       outputVisible: false,
       creatUserVisible: false,
       exportform: {
@@ -165,6 +188,11 @@ export default {
         prefix: '',
         creatNum: 0,
         isAdminvalue: false
+      },
+      modifyPasswordForm: {
+        passwordOld: '',
+        passwordNew: '',
+        passwordAgain: ''
       },
       startIndex:0,
       endIndex:0,
@@ -206,8 +234,20 @@ export default {
         prefix: [{required: true, trigger:'blur', validator: isvalidPrefix}],
         creatNum: [{required: true,trigger:'blur',validator: isvalidNums}],
       },
-      createUserLoading: false
+      changePasswordRules: {
+        passwordOld: [{required: true,trigger: 'blur',validator:validPswOld }],
+        passwordNew: [{required: true,trigger: 'blur',validator:validPswNew }],
+        passwordAgain: [{required: true,trigger: 'blur',validator:validPswAgain }],
+      },
+      createUserLoading: false,
+      changePasswordLoading: false
     }
+  },
+  created () {
+    this.userId = getUserId()
+    this.pswOld = getPsw()
+    console.log(this.pswOld)
+    console.log(this.userId)
   },
   components: {
     Breadcrumb,
@@ -223,6 +263,10 @@ export default {
   methods: {
     toggleSideBar() {
       this.$store.dispatch('ToggleSideBar')
+    },
+    resetChangePswForm (formName) {
+      this.$refs[formName].resetFields()
+      this.dialogFormVisible = false
     },
     uploadCom: function (file) {
       console.log('uploadstart')
@@ -318,7 +362,26 @@ export default {
       })
     },
     handleUpdate() {
-      /* const passwordCookie = this.getCookie('password')*/
+      this.$refs.modifyUserForm.validate(valid => {
+        if(valid) {
+          this.changePasswordLoading = true
+          changePassword(this.userId,this.modifyPasswordForm.passwordNew).then(() => {
+            /*console.log('changeSuccess')*/
+            this.changePasswordLoading = false
+            this.$notify({
+              title: '成功',
+              message: '密码修改成功，请重新登录！',
+              type: 'success',
+              duration: 2000
+            })
+            this.$store.dispatch('FedLogOut').then(() => {
+              this.$router.replace({ path: '/login' })
+            })
+          }).catch(() => {
+            this.changePasswordLoading = false
+          })
+        }
+      })
     }
   }
 }

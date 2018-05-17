@@ -46,3 +46,18 @@ export function createUser(data) {
     data
   })
 }
+
+export function changePassword(id, psw) {
+  return request({
+    url: '/users/' + id + '/changepassword',
+    method: 'patch',
+    params: {
+      userId: id,
+      password: psw
+    },
+    auth: {
+      username: 'admin',
+      password: 'admin'
+    }
+  })
+}

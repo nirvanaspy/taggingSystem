@@ -33,6 +33,18 @@ export function setRoles(roles) {
 export function removeToken() {
   return Cookies.remove(TokenKey)
 }
+export function setUserId(id) {
+  return Cookies.set('userId', id)
+}
+export function removeUserId() {
+  return Cookies.remove('userId')
+}
+export function getUserId() {
+  return Cookies.get('userId')
+}
+export function getPsw() {
+  return Cookies.get('password')
+}
 export function rolesFlag() {
 /*  if (Cookies.get(RolesKey) === 'admin') {
     console.log(Cookies.get(RolesKey))

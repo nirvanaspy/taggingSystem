@@ -41,3 +41,10 @@ export function isvalidNum(num) {
   return reg.test(num)
 }
 
+// 密码大小写数字混合至少六位
+export function isvalidPassword(num) {
+  const reg = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/
+  /* const reg = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/*/
+  return reg.test(num)
+}
+
