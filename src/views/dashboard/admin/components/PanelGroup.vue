@@ -67,7 +67,8 @@ export default {
       autoplayFlag: false,
       tableKey: 0,
       list: [],
-      conflictLength: 0
+      conflictLength: 0,
+      conflicts: []
     }
   },
   created() {
@@ -87,10 +88,19 @@ export default {
         this.listLoading = false
       })
     },
-    getConflictList () {
+    getConflictList() {
       conflictList().then(response => {
-        console.log(response.data.data.length)
-        this.conflictLength = response.data.data.length
+        console.log(response.data.data)
+        this.conflicts = response.data.data
+        this.conflictLength = this.conflictsA.length
+      })
+    }
+  },
+  computed: {
+    conflictsA: function() {
+      const self = this
+      return self.conflicts.filter(function(item) {
+        return item.documentEntity.reviewed
       })
     }
   }

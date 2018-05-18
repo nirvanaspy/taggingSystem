@@ -14,7 +14,7 @@
           v-model="value"
           filterable
           allow-create
-          placeholder="新建或删除一个分类"
+          placeholder="新建一个分类"
           @change="selectedMarkType()"
         >
           <el-option
@@ -25,7 +25,7 @@
             :value="item.id">
           </el-option>
         </el-select>
-        <span @click="deleteTypes"><el-button type="danger" icon="el-icon-delete" circle></el-button></span>
+        <!--<span @click="deleteTypes"><el-button type="danger" icon="el-icon-delete" circle></el-button></span>-->
       </div>
     </div>
     <!--listA.slice((currentPage-1)*pagesize,currentPage*pagesize)-->

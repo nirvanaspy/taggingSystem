@@ -142,7 +142,7 @@ export default {
     }
     const validPswNew = (rule, value, callback) => {
       if (!isvalidPassword(value)) {
-        callback(new Error('新密码必须是大小英文字母和数字混合，至少六位'))
+        callback(new Error('新密码必须是英文字母和数字混合，至少六位'))
       } else {
         callback()
       }

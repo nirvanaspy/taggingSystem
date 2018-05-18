@@ -107,6 +107,111 @@
         </div>
       </div>-->
     </div>
+    <!--<el-row>
+      <el-col :span="16"><div class="grid-content bg-purple">
+        <div class="articleContainer" style="padding:6px 20px 6px 6px;text-align: justify">
+          <h3 style="position:relative;margin:0;padding-right:60px;">
+            {{this.document.title}}
+            <div class="fontSizeContainer">
+              <span :class="{'selectedFontSize': pFontSize == 14}" type="text" style="font-size: 12px" @click="setFontSize(14)">T</span>
+              <span :class="{'selectedFontSize': pFontSize == 16}" type="text" style="font-size: 14px" @click="setFontSize(16)">T</span>
+              <span :class="{'selectedFontSize': pFontSize == 18}" type="text" style="font-size: 17px" @click="setFontSize(18)">T</span>
+            </div>
+          </h3>
+
+          <p id="articleT" style="text-indent: 2em;line-height: 24px;font-size: 16px">{{this.document.content}}</p>
+        </div>
+      </div></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple">
+        <div id="tagContainer" class="tagsConatiner" style="height:600px;overflow-y:scroll;border:1px solid #ccc; margin-top:8px;padding-right:10px;padding-top:10px;padding-left:4px;">
+          <div v-if="this.markList && this.markList.length > 0">
+            <div v-for="(item, index) in markList" style="margin-bottom: 10px">
+              <div class="questionContainer">
+                <span style="width:6%;float:left;padding:4px 4px">Q<span style="font-size:12px;">{{index + 1}}</span></span>
+                <el-input style="width: 94%;padding-left:10px;margin-bottom: 10px;" type="textarea"
+                          :autosize="{ minRows: 1}" placeholder="添加标记"
+                          v-model="item.question"
+                >
+                </el-input>
+              </div>
+              <div class="answerContainer">
+                <span style="width:6%;float:left;padding:4px 4px">A<span style="font-size:12px;">{{index + 1}}</span></span>
+                <el-input style="width: 94%;padding-left:10px;" type="textarea"
+                          :autosize="{ minRows: 2}" placeholder="添加答案"
+                          v-model="item.answer"
+                >
+                </el-input>
+              </div>
+              <div class="btnContainer" style="margin:10px 0;height:40px" v-if="!marked">
+                <span style="font-size:14px;float:left;margin-left:28px;padding-top: 10px">类型：{{item.markTypeEntity.name}}</span>
+                <el-button type="danger" :loading="deleteLoading" style="float:right;" @click="deleteTag(item.id)">删除</el-button>
+                <el-button type="primary" :loading="updateLoading" style="float: right;margin-right: 10px;" @click="updateTag(item.id, item)">修改</el-button>
+              </div>
+            </div>
+
+          </div>
+          <div class="inputContainer" style="margin-bottom: 10px" v-if="!marked">
+            <div class="questionContainer">
+              <span style="width:6%;float:left;padding:4px 4px">Q:</span>
+              <el-input style="width: 94%;padding-left:10px;margin-bottom: 10px;" type="textarea"
+                        :autosize="{ minRows: 1}" placeholder="添加标记"
+                        v-model="input1.question"
+              >
+              </el-input>
+            </div>
+            <div class="answerContainer">
+              <span style="width:6%;float:left;padding:4px 4px">A:</span>
+              <el-input style="width: 94%;padding-left:10px" type="textarea"
+                        :autosize="{ minRows: 2}" placeholder="添加答案"
+                        v-model="input1.answer"
+              >
+              </el-input>
+            </div>
+            <div class="btnContainer" style="margin:10px 0;height:40px">
+              <el-button type="success" @click="saveTags" :loading="saveLoading" style="float:right;">保存</el-button>
+              <el-select v-model="value"
+                         @change="selectedMarkType()"
+                         style="float:right;margin-right:10px;width:208px">
+                <el-option
+                  v-for="item in markTypeData"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+          &lt;!&ndash; <div class="inputContainer" style="margin-bottom: 10px">
+             <div class="questionContainer">
+               <span style="float:left;padding:4px 4px">Q:</span>
+               <el-input style="width: 85%;margin:0 0 10px 10px" type="textarea"
+                         :autosize="{ minRows: 1}" placeholder="添加标记">
+               </el-input>
+             </div>
+             <div class="answerContainer">
+               <span style="float:left;padding:4px 4px">A:</span>
+               <el-input style="width: 85%;margin-left: 10px" type="textarea"
+                         :autosize="{ minRows: 2}" placeholder="添加答案">
+               </el-input>
+             </div>
+           </div>
+           <div class="inputContainer" style="margin-bottom: 10px">
+             <div class="questionContainer">
+               <span style="float:left;padding:4px 4px">Q:</span>
+               <el-input style="width: 85%;margin:0 0 10px 10px" type="textarea"
+                         :autosize="{ minRows: 1}" placeholder="添加标记">
+               </el-input>
+             </div>
+             <div class="answerContainer">
+               <span style="float:left;padding:4px 4px">A:</span>
+               <el-input style="width: 85%;margin-left: 10px" type="textarea"
+                         :autosize="{ minRows: 2}" placeholder="添加答案">
+               </el-input>
+             </div>
+           </div>&ndash;&gt;
+        </div>
+      </div></el-col>
+    </el-row>-->
   </div>
 </template>
 
@@ -197,7 +302,7 @@
         markType(this.loginInfo).then((res) => {
           this.markTypeData = res.data.data
           for(var i=0; i<this.markTypeData.length; i++) {
-            if(this.markTypeData[i].name === '默认') {
+            if(this.markTypeData[i].name === '事实型问题') {
               this.valueDefault = this.markTypeData[i].id
               this.value = this.valueDefault
               this.markTypeId = this.value
