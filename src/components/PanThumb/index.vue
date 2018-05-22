@@ -5,7 +5,7 @@
         <slot></slot>
       </div>
     </div>
-    <img class="pan-thumb" src="https://wpimg.wallstcn.com/577965b9-bb9e-4e02-9f0c-095b41417191">
+    <img class="pan-thumb" src="./editor.jpg">
   </div>
 </template>
 

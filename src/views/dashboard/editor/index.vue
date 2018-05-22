@@ -10,7 +10,7 @@
       </div>
     </div>
     <div>
-      <img class="emptyGif" :src="emptyGif">
+      <img class="emptyGif" src="./walker.gif">
     </div>
   </div>
 </template>

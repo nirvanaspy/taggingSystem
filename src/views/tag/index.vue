@@ -342,6 +342,14 @@
             answer: this.input1.answer,
             markType: this.markTypeId
           }
+          if(this.markdata.question == '' || this.markdata.answer == ''){
+            this.$message({
+              message: '请输入问题和答案！',
+              type: 'warning'
+            });
+            this.saveLoading = false
+            return
+          }
         markdocument(this.id, this.markdata, this.loginInfo).then(response => {
           this.input1.question = ''
           this.input1.answer = ''
