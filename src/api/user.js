@@ -7,14 +7,14 @@ export function addUser(data) {
     params: {
       isAdmin: false
     },
-    auth: {
+    /* auth: {
       username: 'admin',
       password: 'admin'
-    },
+    },*/
     data
   })
 }
-
+// 没用到
 export function modifyUser(data) {
   return request({
     url: 'users',
@@ -30,7 +30,7 @@ export function modifyUser(data) {
   })
 }
 
-export function createUser(data) {
+export function createUser(data, loginInfo) {
   return request({
     url: '/users/creatusers',
     method: 'post',
@@ -40,14 +40,16 @@ export function createUser(data) {
       isAdmin: data.isAdmin
     },
     auth: {
-      username: 'admin',
-      password: 'admin'
+      /* username: 'admin',
+      password: 'admin'*/
+      username: loginInfo.username,
+      password: loginInfo.password
     },
     data
   })
 }
 
-export function changePassword(id, psw) {
+export function changePassword(id, psw, loginInfo) {
   return request({
     url: '/users/' + id + '/changepassword',
     method: 'patch',
@@ -56,8 +58,10 @@ export function changePassword(id, psw) {
       password: psw
     },
     auth: {
-      username: 'admin',
-      password: 'admin'
+      /* username: 'admin',
+      password: 'admin'*/
+      username: loginInfo.username,
+      password: loginInfo.password
     }
   })
 }

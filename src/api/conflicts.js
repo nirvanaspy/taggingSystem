@@ -8,15 +8,15 @@ export function conflictList(listQuery, loginInfo) {
     },
     method: 'get',
     auth: {
-      /* username: loginInfo.username,
-      password: loginInfo.password*/
-      username: 'admin',
-      password: 'admin'
+      username: loginInfo.username,
+      password: loginInfo.password
+      /* username: 'admin',
+      password: 'admin'*/
     }
   })
 }
 
-export function resolveConflicts(conflictId, markId, answers) {
+export function resolveConflicts(conflictId, markId, answers, loginInfo) {
   return request({
     url: '/conflicts/' + conflictId + '/marks/' + markId + '/resolve',
     params: {
@@ -26,10 +26,10 @@ export function resolveConflicts(conflictId, markId, answers) {
     },
     method: 'post',
     auth: {
-      /* username: loginInfo.username,
-      password: loginInfo.password*/
-      username: 'admin',
-      password: 'admin'
+      username: loginInfo.username,
+      password: loginInfo.password
+      /* username: 'admin',
+      password: 'admin'*/
     }
   })
 }

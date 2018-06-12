@@ -14,13 +14,15 @@ export function documentList(listQuery, loginInfo) {
   })
 }
 
-export function importDocu(data) {
+export function importDocu(data, loginInfo) {
   return request({
     url: '/documents/import',
     method: 'post',
     auth: {
-      username: 'admin',
-      password: 'admin'
+      /* username: 'admin',
+      password: 'admin'*/
+      username: loginInfo.username,
+      password: loginInfo.password
     },
     headers: {
       'content-type': 'application/x-www-form-urlencoded'
@@ -29,7 +31,7 @@ export function importDocu(data) {
   })
 }
 
-export function outputDocu(data) {
+export function outputDocu(data, loginInfo) {
   return request({
     url: '/documents/export',
     method: 'get',
@@ -39,8 +41,10 @@ export function outputDocu(data) {
       endindex: data.endIndex
     },
     auth: {
-      username: 'admin',
-      password: 'admin'
+      /* username: 'admin',
+      password: 'admin'*/
+      username: loginInfo.username,
+      password: loginInfo.password
     },
     headers: {
       'content-type': 'application/x-www-form-urlencoded'
