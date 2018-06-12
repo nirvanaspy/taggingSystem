@@ -68,10 +68,16 @@ export default {
       tableKey: 0,
       list: [],
       conflictLength: 0,
-      conflicts: []
+      conflicts: [],
+      userData: {
+        username: '',
+        password: ''
+      }
     }
   },
   created() {
+    this.userData.username = this.getCookie('username')
+    this.userData.password = this.getCookie('password')
     this.autoplayFlag = false
     this.getList()
     this.getConflictList()
@@ -82,14 +88,14 @@ export default {
     },
     getList() {
       this.listLoading = true
-      countList(this.listQuery).then(response => {
+      countList(this.userData).then(response => {
         this.list = response.data.data
         this.autoplayFlag = true
         this.listLoading = false
       })
     },
     getConflictList() {
-      conflictList().then(response => {
+      conflictList(this.userData).then(response => {
         console.log(response.data.data)
         this.conflicts = response.data.data
         this.conflictLength = this.conflictsA.length

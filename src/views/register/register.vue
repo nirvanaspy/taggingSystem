@@ -39,7 +39,7 @@
 </template>
 
 <script>
-  import { isvalidUsername, isvalidConfirmPass } from '@/utils/validate'
+  import { isvalidUsername, isvalidConfirmPass, isvalidPassword } from '@/utils/validate'
   import { addUser } from '../../api/user'
 
   /* eslint-disable */
@@ -54,8 +54,8 @@
         }
       };
       const validatePass = (rule, value, callback) => {
-        if (value.length < 6) {
-          callback(new Error('密码不能小于6位'))
+        if (!isvalidPassword(value)) {
+          callback(new Error('新密码必须是英文字母和数字混合，至少六位'))
         } else {
           callback()
         }

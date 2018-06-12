@@ -231,7 +231,7 @@
       resolveMarkConflict (mId, answers) {
         this.resolveLoading = true
         console.log(this.cId,'thiscid')
-        resolveConflicts(this.cId, mId, answers).then(() => {
+        resolveConflicts(this.cId, mId, answers, this.loginInfo).then(() => {
           this.getdocument()
           this.resolveLoading = false
           console.log('resolvesuccess')

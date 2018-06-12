@@ -100,11 +100,17 @@
         markdata:[],
         markList:null,
         tagName: [],
-        answerName: []
+        answerName: [],
+        loginInfo: {
+          username: '',
+          password: ''
+        },
       }
     },
     created() {
       this.getList()
+      this.loginInfo.username = this.getCookie('username')
+      this.loginInfo.password = this.getCookie('password')
       this.id = this.$route.params.id
       this.getdocument()
     },
@@ -113,7 +119,7 @@
     methods: {
       getList() {
         this.listLoading = true
-        documentList(this.listQuery).then(response => {
+        documentList(this.listQuery,this.loginInfo).then(response => {
           this.list = response.data.data
           this.total = response.data.total
           this.listLoading = false
@@ -123,7 +129,7 @@
       },
       getdocument () {
         this.listLoading = true
-        documentDetail(this.id).then(response => {
+        documentDetail(this.id, this.loginInfo).then(response => {
           this.document = response.data.data
           this.marked= this.document.marked
           this.markList = response.data.data.markEntityList
@@ -153,7 +159,7 @@
 
           }
         )
-        markdocument(this.id, this.markdata).then(response => {
+        markdocument(this.id, this.markdata, this.loginInfo).then(response => {
           // console.log(response.data)
           this.input.question = ''
           this.input1.answer = ''
@@ -171,7 +177,7 @@
 
         console.log(this.markList.length)
         if(this.markList.length >= 5){
-          commitdocument(this.id).then(response => {
+          commitdocument(this.id, this.loginInfo).then(response => {
             this.$message({
               message: '提交成功',
               type: 'success'

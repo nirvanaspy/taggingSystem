@@ -36,7 +36,7 @@
           <el-dropdown-item v-if="token === 'admin'" style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="creatUserVisible = true">生成用户</span>
           </el-dropdown-item>
-          <el-dropdown-item v-if="token !== 'admin'" style="padding:0">
+          <el-dropdown-item style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="dialogFormVisible = true">修改密码</span>
           </el-dropdown-item>
           <el-dropdown-item style="padding:0">
@@ -225,6 +225,10 @@ export default {
       creatNum: 0,
       value: '',
       isAdminvalue: false,
+      loginInfo: {
+        username: '',
+        password: ''
+      },
       exportRules: {
         selected:[{required: true, message: '请选择导出类型', trigger: 'change'}],
         startIndex: [{required: true,trigger: 'blur',validator: isvalidNums}],
@@ -244,10 +248,10 @@ export default {
     }
   },
   created () {
+    this.loginInfo.username = this.getCookie('username')
+    this.loginInfo.password = this.getCookie('password')
     this.userId = getUserId()
     this.pswOld = getPsw()
-    console.log(this.pswOld)
-    console.log(this.userId)
   },
   components: {
     Breadcrumb,
@@ -285,7 +289,7 @@ export default {
       this.uploadLength = this.$refs.uploader.uploadFiles.length
       console.log(this.uploadLength)
 
-      importDocu(formData).then(() => {
+      importDocu(formData,this.loginInfo).then(() => {
        /* setTimeout(() => {
           loading.close();
         }, 2000);*/
@@ -314,7 +318,7 @@ export default {
             startIndex: this.exportform.startIndex,
             endIndex: this.exportform.endIndex
           }
-          outputDocu(configData).then()
+          outputDocu(configData,this.loginInfo).then()
           let exportLink = process.env.BASE_API + '/documents/export' + '?type='+ this.exportform.selected + '&startindex=' + this.exportform.startIndex + '&endindex=' + this.exportform.endIndex
           window.open(exportLink)
           this.exportform.selected = ''
@@ -333,7 +337,7 @@ export default {
             num: this.createUserForm.creatNum,
             isAdmin: this.createUserForm.isAdminvalue
           }
-          createUser(createUserData).then((res) => {
+          createUser(createUserData, this.loginInfo).then((res) => {
             console.log(res.data.data)
             this.createUserForm.prefix = ''
             this.createUserForm.creatNum = 0
@@ -365,7 +369,7 @@ export default {
       this.$refs.modifyUserForm.validate(valid => {
         if(valid) {
           this.changePasswordLoading = true
-          changePassword(this.userId,this.modifyPasswordForm.passwordNew).then(() => {
+          changePassword(this.userId,this.modifyPasswordForm.passwordNew, this.loginInfo).then(() => {
             /*console.log('changeSuccess')*/
             this.changePasswordLoading = false
             this.$notify({
