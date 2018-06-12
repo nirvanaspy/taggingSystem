@@ -126,6 +126,18 @@ export const constantRouterMap = [
     ]
   },
   {
+    path: '/progress',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'progressDetail',
+        component: () => import('@/views/progress/index'),
+        meta: { title: '进度', icon: 'processLogo' }
+      }
+    ]
+  },
+  {
     path: '/conflict',
     component: Layout,
     /* hidden: getHidden() === 'true' ? true : false,*/
