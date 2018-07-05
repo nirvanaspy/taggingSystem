@@ -4,7 +4,8 @@ export function documentList(listQuery, loginInfo) {
   return request({
     url: 'documents/mark',
     params: {
-      userId: ''
+      userId: '',
+      isMarked: false
     },
     method: 'get',
     auth: {

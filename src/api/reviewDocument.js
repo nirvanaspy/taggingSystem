@@ -17,7 +17,8 @@ export function documentListReview(listQuery, loginInfo) {
   return request({
     url: 'documents/review',
     params: {
-      userId: ''
+      userId: '',
+      isReviewed: false
     },
     method: 'get',
     auth: {

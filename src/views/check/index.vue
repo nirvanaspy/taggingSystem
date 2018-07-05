@@ -25,10 +25,11 @@
           <span>{{scope.row.type}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" label="审阅" prop="reviewed"
+      <!--<el-table-column width="150px" label="审阅" prop="reviewed"
                        :filters="[{ text: '已审阅', value: true }, { text: '未审阅', value: false }]"
                        :filter-method="filterTag"
-      >
+      >-->
+      <el-table-column width="150px" label="审阅" prop="reviewed">
         <template slot-scope="scope">
           <span class="el-tag el-tag--success" v-if="scope.row.reviewed">已审阅</span>
           <span class="el-tag el-tag--danger" v-else>未审阅</span>
@@ -46,7 +47,7 @@
       <el-form ref="dataForm" :rules="applyRules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="申请数量: " prop="num">
           <el-input v-model="temp.num" style="width: 200px"></el-input>
-          <div style="height:20px;color:red;">{{this.errorMessage}}</div>
+          <div style="color:red;">{{this.errorMessage}}</div>
         </el-form-item>
 
       </el-form>
@@ -84,6 +85,8 @@
       const isvalidNums = (rule, num, callback) => {
         if (!isvalidNum(num)) {
           callback(new Error('请输入一个正整数'))
+        } else if(num > 100){
+          callback(new Error('一次最多选择100篇'))
         } else {
           callback()
         }
@@ -174,36 +177,42 @@
       ApplyCheck() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.applyLoading = true
-            let formData = new FormData();
-            formData.append('num', this.temp.num);
+            this.$confirm('是否确认申请审阅的数量？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.applyLoading = true
+              let formData = new FormData();
+              formData.append('num', this.temp.num);
 
-            //console.log(formData);
-            var that = this
-            distributionReviewDoc(formData, this.loginInfo).then(response => {
-              this.list = response.data.data;
-              this.applyLoading = false
-              //console.log(response.data)
-              console.log(response.data.data)
-              //this.list.unshift(this.temp)
-              this.dialogFormVisible = false
-              this.listLoading = false
-              this.$notify({
-                title: '成功',
-                message: '申请成功',
-                type: 'success',
-                duration: 2000
+              //console.log(formData);
+              var that = this
+              distributionReviewDoc(formData, this.loginInfo).then(response => {
+                this.list = response.data.data;
+                this.applyLoading = false
+                //console.log(response.data)
+                console.log(response.data.data)
+                //this.list.unshift(this.temp)
+                this.dialogFormVisible = false
+                this.listLoading = false
+                this.$notify({
+                  title: '成功',
+                  message: '申请成功',
+                  type: 'success',
+                  duration: 2000
+                })
+                this.getList()
+              }).catch((error) => {
+                this.applyLoading = false
+                console.log(3222)
+                if(error.response.data.status === 500){
+                  this.errorMessage = error.response.data.message
+                }else{
+                  this.errorMessage = '请输入正确的数量'
+                  console.log('error')
+                }
               })
-              this.getList()
-            }).catch((error) => {
-              this.applyLoading = false
-              console.log(3222)
-              if(error.response.data.status === 500){
-                this.errorMessage = error.response.data.message
-              }else{
-                this.errorMessage = '请输入正确的数量'
-                console.log('error')
-              }
             })
           }
         })

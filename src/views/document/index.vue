@@ -44,9 +44,10 @@
           <span>{{scope.row.type}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" label="标注" prop="marked"
+      <!--<el-table-column width="150px" label="标注" prop="marked"
                        :filters="[{ text: '已标注', value: true }, { text: '未标注', value: false }]"
-                       :filter-method="filterTag">
+                       :filter-method="filterTag">-->
+      <el-table-column width="150px" label="标注" prop="marked">
         <template slot-scope="scope">
           <span class="el-tag el-tag--success" v-if="scope.row.marked">已标注</span>
           <span class="el-tag el-tag--danger" v-else>未标注</span>
@@ -93,6 +94,8 @@
       const isvalidNums = (rule, num, callback) => {
         if (!isvalidNum(num)) {
           callback(new Error('请输入一个正整数'))
+        } else if(num > 100){
+          callback(new Error('一次最多选择100篇'))
         } else {
           callback()
         }
@@ -100,6 +103,7 @@
       return {
         tableKey: 0,
         list: [],
+        listNotMark: [],
         total: null,
         listLoading: true,
         listQuery: {
@@ -121,7 +125,7 @@
           num: ''
         },
         applyRules: {
-          endIndex: [{required: true,trigger: 'blur',validator: isvalidNums}]
+          num: [{required: true,trigger: 'blur',validator: isvalidNums}]
         },
         loginInfo: {
           username: '',
@@ -193,6 +197,12 @@
         this.listLoading = true
         documentList(this.listQuery,this.loginInfo).then(response => {
           this.list = response.data.data
+          /*let dataList = response.data.data
+          for(var i = 0; i < dataList.length; i++ ) {
+            if (dataList[i].marked == false){
+              this.listNotMark.push(dataList[i])
+            }
+          }*/
           this.total = response.data.total
           this.listLoading = false
           this.oldList = this.list.map(v => v.id);
@@ -230,31 +240,35 @@
       ApplyDoc() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.applyLoading = true
-            let formData = new FormData();
-            formData.append('num', this.temp.num);
-            docDistribution(formData, this.loginInfo).then(response => {
-              this.list = response.data.data;
-              //this.list.unshift(this.temp)
+            this.$confirm('是否确认申请标注的数量？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
               this.applyLoading = true
-              this.dialogFormVisible = false
-              this.listLoading = false
-              this.$notify({
-                title: '成功',
-                message: '申请成功',
-                type: 'success',
-                duration: 2000
+              let formData = new FormData();
+              formData.append('num', this.temp.num);
+              docDistribution(formData, this.loginInfo).then(response => {
+                this.list = response.data.data;
+                //this.list.unshift(this.temp)
+                this.applyLoading = false
+                this.dialogFormVisible = false
+                this.listLoading = false
+                this.$notify({
+                  title: '成功',
+                  message: '申请成功',
+                  type: 'success',
+                  duration: 2000
+                })
+                this.getList()
+              }).catch(() => {
+                this.applyLoading = false
               })
-
-              this.getList()
-
-
-            }).catch(() => {
-              this.applyLoading = false
             })
-
           }
         })
+
+
       },
       handleFilter() {
         this.listQuery.page = 1;

@@ -1,6 +1,7 @@
 <template>
   <div class="app-container calendar-list-container" style="height: 100%">
     <div class="btnContainer" id="btnContainer" style="position:relative;height:40px;">
+      <span style="line-height: 40px;padding-left: 8px;font-weight: bold;">标注者：{{markUser}}</span>
       <el-button type="success" v-if="!reviewed" @click="commitTags" :loading="commitLoading" style="position:absolute;right:0;">提交</el-button>
       <el-button type="success" v-else plain style="position:absolute;right:0;" disabled="disabled">已提交</el-button>
     </div>
@@ -126,7 +127,8 @@
         },
         loadingTag:true,
         conflictLoading: false,
-        commitLoading: false
+        commitLoading: false,
+        markUser: ''
       }
     },
     created() {
@@ -178,6 +180,7 @@
       getdocument () {
         this.listLoading = true
         documentDetail(this.id,this.loginInfo).then(response => {
+          this.markUser = response.data.data.markUser.username
           this.document = response.data.data
           this.marked= this.document.marked
           this.reviewed = this.document.reviewed

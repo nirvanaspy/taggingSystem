@@ -38,7 +38,11 @@
             <span>{{scope.row.reviewFinishedNum}}</span>
           </template>
         </el-table-column>
-
+        <el-table-column label="冲突数" prop="conflictNum" sortable>
+          <template slot-scope="scope">
+            <span>{{scope.row.conflictNum}}</span>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <div class="app-container calendar-list-container" v-else>
@@ -71,7 +75,11 @@
             <span>{{scope.row.reviewFinishedNum}}</span>
           </template>
         </el-table-column>
-
+        <el-table-column label="冲突数">
+          <template slot-scope="scope">
+            <span>{{scope.row.conflictNum}}</span>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -129,7 +137,8 @@
           const self = this
           return self.list.filter(function (item) {
             /* console.log(item)*/
-            return item.userEntity.username.toLowerCase().indexOf(self.loginInfo.username.toLowerCase()) !== -1;
+            // return item.userEntity.username.toLowerCase().indexOf(self.loginInfo.username.toLowerCase()) !== -1;
+            return item.userEntity.username.toLowerCase() === self.loginInfo.username.toLowerCase();
           })
         }
       }
