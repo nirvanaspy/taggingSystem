@@ -104,8 +104,6 @@
       registerUser: function() {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
-            console.log(this.loginForm.password);
-            console.log(this.loginForm.againPassword);
             if(this.loginForm.password !== this.loginForm.againPassword){
               this.$message({
                 message: '两次密码不一致',

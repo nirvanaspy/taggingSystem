@@ -65,17 +65,6 @@
         <el-button type="primary" @click="ApplyDoc" :loading="applyLoading">确认</el-button>
       </div>
     </el-dialog>
-    <!--<div class="paginationContainer">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="listA.length">
-      </el-pagination>
-    </div>-->
   </div>
 </template>
 

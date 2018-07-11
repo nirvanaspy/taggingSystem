@@ -38,15 +38,15 @@
             <span>{{scope.row.reviewFinishedNum}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="冲突数" prop="conflictNum" sortable>
+        <!--<el-table-column label="冲突数" prop="conflictNum" sortable>
           <template slot-scope="scope">
             <span>{{scope.row.conflictNum}}</span>
           </template>
-        </el-table-column>
+        </el-table-column>-->
       </el-table>
     </div>
     <div class="app-container calendar-list-container" v-else>
-      <el-table :data="listB" v-loading="listLoading" element-loading-text="数据加载中" border fit highlight-current-row
+      <el-table :data="listA" v-loading="listLoading" element-loading-text="数据加载中" border fit highlight-current-row
                 style="width: 100%"
       >
 
@@ -75,11 +75,11 @@
             <span>{{scope.row.reviewFinishedNum}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="冲突数">
+        <!--<el-table-column label="冲突数">
           <template slot-scope="scope">
             <span>{{scope.row.conflictNum}}</span>
           </template>
-        </el-table-column>
+        </el-table-column>-->
       </el-table>
     </div>
   </div>
@@ -87,7 +87,7 @@
 
 <script>
     import waves from '@/directive/waves' // 水波纹指令
-    import { getProgress } from '../../api/progress'
+    import { getProgress, getProgressByUser } from '../../api/progress'
     /*eslint-disable*/
     export default {
       name: 'progressDetail',
@@ -103,10 +103,13 @@
             username: '',
             password: ''
           },
-          list: []
+          list: [],
+          authRole: ''
         }
       },
       created() {
+        this.authRole = this.$store.getters.userAuth
+        this.userId = this.getCookie('userId')
         this.loginInfo.username = this.getCookie('username')
         this.loginInfo.password = this.getCookie('password')
         this.getList()
@@ -114,11 +117,20 @@
       methods: {
         getList() {
           this.listLoading = true
-          getProgress(this.loginInfo).then((res) => {
-            this.listLoading = false
-            this.list = res.data.data
-            console.log('progressSucess')
-          })
+          if(this.authRole === 'ADMIN') {
+            getProgress(this.loginInfo).then((res) => {
+              this.listLoading = false
+              this.list = res.data.data
+            })
+          } else {
+            getProgressByUser(this.loginInfo,this.userId).then((res) => {
+              this.listLoading = false
+              this.list.push(res.data.data)
+            })
+          }
+        },
+        getListByUser() {
+          this.listLoading = true
         },
         handleFilter() {
           this.listQuery.page = 1
@@ -132,15 +144,15 @@
             /* console.log(item)*/
             return item.userEntity.username.toLowerCase().indexOf(self.searchQuery.toLowerCase()) !== -1;
           })
-        },
+        }/*,
         listB: function() {
           const self = this
           return self.list.filter(function (item) {
-            /* console.log(item)*/
+            /!* console.log(item)*!/
             // return item.userEntity.username.toLowerCase().indexOf(self.loginInfo.username.toLowerCase()) !== -1;
             return item.userEntity.username.toLowerCase() === self.loginInfo.username.toLowerCase();
           })
-        }
+        }*/
       }
     }
 </script>

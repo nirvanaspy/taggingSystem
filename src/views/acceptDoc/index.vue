@@ -13,23 +13,27 @@
 
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
 
-<!--      <el-button class="filter-item pull-right" style="float: right;margin-left: 10px;" @click="handleApply" type="primary"
+      <!--<el-button class="filter-item pull-right" style="float: right;margin-left: 10px;" @click="handleApply" type="primary"
                  icon="el-icon-plus">申请冲突标注
       </el-button>-->
     </div>
     <!--:data="listA.slice((currentPage-1)*pagesize,currentPage*pagesize)"-->
     <el-table :key='tableKey' :data="listA" v-loading="listLoading" element-loading-text="请稍等" border fit highlight-current-row
               style="width: 100%">
-
+      <el-table-column width="150px" label="索引" :width="60" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.row.id}}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="标题" min-width="100">
         <template slot-scope="scope">
-          <router-link class="titleHover" :to='{name:"ConflictDetails",params:{id:scope.row.documentEntity.id,cId:scope.row.id}}'>{{scope.row.documentEntity.title}}</router-link>
+          <router-link class="titleHover" :to='{name:"acceptDocDetail",params:{id:scope.row.id}}'>{{scope.row.title}}</router-link>
           <!--<span>{{scope.row.title}}</span>-->
         </template>
       </el-table-column>
-      <el-table-column width="150px" label="类型">
+      <el-table-column width="150px" label="类型" align="center">
         <template slot-scope="scope">
-          <span>{{scope.row.documentEntity.type}}</span>
+          <span>{{scope.row.type}}</span>
         </template>
       </el-table-column>
       <!--<el-table-column width="150px" label="标注" prop="marked"
@@ -41,28 +45,29 @@
         </template>
       </el-table-column>-->
     </el-table>
-    <!--<el-dialog title="申请冲突标注" :visible.sync="dialogFormVisible" width="40%">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px">
-        <el-form-item label="申请数量: " prop="num">
-          <el-input v-model="temp.num" style="width: 200px"></el-input>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="ApplyDoc">确认</el-button>
-      </div>
-    </el-dialog>-->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[20,50,100]"
+      :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="this.total"
+      background
+      style="text-align: center;margin-top:20px"
+    >
+    </el-pagination>
   </div>
 </template>
 
 <script>
-  import { documentList, docDistribution } from '@/api/tagdocument'
-  import { conflictList } from '../../api/conflicts'
+  import { docDistribution } from '@/api/tagdocument'
+  // import { conflictList } from '../../api/conflicts'
+  import { getAcceptDoc } from '@/api/recheckByAdmin'
   import waves from '@/directive/waves' // 水波纹指令
   /* eslint-disable */
   export default {
-    name: 'document',
+    name: 'recheck',
     directives: {
       waves
     },
@@ -73,7 +78,8 @@
         total: null,
         listLoading: true,
         listQuery: {
-          page: 1,
+          page: 0,
+          size:20,
           limit: 5,
           tagname: ''
         },
@@ -109,9 +115,10 @@
     methods: {
       getList() {
         this.listLoading = true
-        conflictList(this.listQuery,this.loginInfo).then(response => {
-          this.list = this.filterList(response.data.data)
-          this.total = response.data.total
+        getAcceptDoc(this.loginInfo, this.listQuery).then(response => {
+          // this.list = this.filterList(response.data.data)
+          this.list = response.data.data.content
+          this.total = response.data.data.totalElements
           this.listLoading = false
           this.oldList = this.list.map(v => v.id);
           this.newList = this.oldList.slice()
@@ -120,7 +127,7 @@
       filterList (list) {
         return list.filter(function (item) {
           /* console.log(item) */
-          return item.documentEntity.reviewed ===true
+          // return item.documentEntity.reviewed ===true
         })
       },
       filterTag(value, row) {
@@ -129,14 +136,14 @@
         return row.marked === value;
       },
       handleSizeChange(val) {
-        this.listQuery.limit = val
+        this.listQuery.size = val
         this.pagesize = val
-        // this.getList()
+        this.getList()
       },
       handleCurrentChange(val) {
-        this.listQuery.page = val
+        this.listQuery.page = val - 1
         this.currentPage = val
-        // this.getList()
+        this.getList()
       },
       resetTemp() {
         this.temp = {
@@ -194,7 +201,7 @@
         let self = this;
         return self.list.filter(function (item) {
           /* console.log(item) */
-          return item.documentEntity.title.toLowerCase().indexOf(self.searchQuery.toLowerCase()) !== -1;
+          return item.title.toLowerCase().indexOf(self.searchQuery.toLowerCase()) !== -1;
         })
 
       }

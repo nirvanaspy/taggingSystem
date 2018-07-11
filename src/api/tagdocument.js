@@ -84,13 +84,14 @@ export function markdocument(id, data, loginInfo) {
     }
   })
 }
-export function updateMark(id, data, loginInfo) {
+export function updateMark(id, data, changeTypeId, loginInfo) {
   return request({
     url: '/marks/' + id,
     params: {
       MarkId: id,
       question: data.question,
-      answer: data.answer
+      answer: data.answer,
+      markTypeId: changeTypeId
     },
     method: 'put',
     auth: {
@@ -140,3 +141,17 @@ export function docDistribution(data, loginInfo) {
   })
 }
 
+/* export function getDocByMarkUser(loginInfo, id) {
+  return request({
+    url: 'documents/mark',
+    params: {
+      userId: id,
+      isMarked: true
+    },
+    method: 'get',
+    auth: {
+      username: loginInfo.username,
+      password: loginInfo.password
+    }
+  })
+}*/

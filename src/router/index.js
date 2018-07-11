@@ -125,22 +125,10 @@ export const constantRouterMap = [
       }
     ]
   },
-  {
-    path: '/progress',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'progressDetail',
-        component: () => import('@/views/progress/index'),
-        meta: { title: '进度', icon: 'processLogo' }
-      }
-    ]
-  },
-  {
+  /* {
     path: '/conflict',
     component: Layout,
-    /* hidden: getHidden() === 'true' ? true : false,*/
+    /!* hidden: getHidden() === 'true' ? true : false,*!/
     children: [
       {
         path: 'index',
@@ -160,6 +148,83 @@ export const constantRouterMap = [
         name: 'ConflictDetails',
         component: () => import('@/views/conflictDetails/index'),
         meta: { title: '冲突', icon: 'bug' }
+      }
+    ]
+  },*/
+  {
+    path: '/markTypeInfo',
+    component: Layout,
+    /* hidden: getHidden() === 'true' ? true : false,*/
+    children: [
+      {
+        path: 'index',
+        name: 'markInfo',
+        component: () => import('@/views/markInfo/index'),
+        meta: { title: '问题比例', icon: 'counts' }
+      }
+    ]
+  },
+  {
+    path: '/recheckByAdmin',
+    component: Layout,
+    /* hidden: getHidden() === 'true' ? true : false,*/
+    children: [
+      {
+        path: 'index',
+        name: 'recheckByAdmin',
+        component: () => import('@/views/recheckByAdmin/index'),
+        meta: { title: '复审', icon: 'bug' }
+      }
+    ]
+  },
+  {
+    path: '/recheckByAdminDetails',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index/:id',
+        name: 'recheckByAdminDetails',
+        component: () => import('@/views/recheckByAdminDetails/index'),
+        meta: { title: '复审详情', icon: 'bug' }
+      }
+    ]
+  },
+  {
+    path: '/acceptedDoc',
+    component: Layout,
+    /* hidden: getHidden() === 'true' ? true : false,*/
+    children: [
+      {
+        path: 'index',
+        name: 'acceptedDoc',
+        component: () => import('@/views/acceptDoc/index'),
+        meta: { title: '已通过', icon: 'accepted2' }
+      }
+    ]
+  },
+  {
+    path: '/acceptedDocDetail',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index/:id',
+        name: 'acceptDocDetail',
+        component: () => import('@/views/acceptDocDetail/index'),
+        meta: { title: '已通过详情', icon: 'accepted1' }
+      }
+    ]
+  },
+  {
+    path: '/progress',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'progressDetail',
+        component: () => import('@/views/progress/index'),
+        meta: { title: '进度', icon: 'processLogo' }
       }
     ]
   },

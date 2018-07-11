@@ -7,7 +7,8 @@ const user = {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: []
+    roles: [],
+    userAuth: ''
   },
 
   mutations: {
@@ -22,6 +23,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_AUTH: (state, authRole) => {
+      state.userAuth = authRole
     }
   },
 
@@ -41,14 +45,16 @@ const user = {
         }
         console.log(getHidden(), 12345)
         login(username, userInfo.password).then(response => {
-          console.log('userInfo')
           const data = response.data
-          console.log(data)
           /* setToken(data.token) */
           setToken(data.username)
           setUserId(data.data.id)
-          console.log(data.data.id)
           commit('SET_TOKEN', data.username)
+          if (data.data.authorities.length === 1) {
+            commit('SET_AUTH', 'NORMALUSER')
+          } else if (data.data.authorities.length === 2) {
+            commit('SET_AUTH', 'ADMIN')
+          }
           /* if (username === 'admin') {
             commit('SET_ROLES', 'admin')
             setRoles('admin')
@@ -56,7 +62,6 @@ const user = {
             commit('SET_ROLES', 'editor')
             setRoles('editor')
           }*/
-          console.log('settokensuccess')
           resolve()
         }).catch(error => {
           reject(error)
@@ -77,6 +82,11 @@ const user = {
           commit('SET_ROLES', roleA)
           setRoles('admin')
           commit('SET_NAME', data.username)
+          if (data.data.authorities.length === 1) {
+            commit('SET_AUTH', 'NORMALUSER')
+          } else if (data.data.authorities.length === 2) {
+            commit('SET_AUTH', 'ADMIN')
+          }
           /* commit('SET_AVATAR', data.avatar) */
           resolve(response)
         }).catch(error => {

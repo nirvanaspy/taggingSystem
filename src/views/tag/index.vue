@@ -39,11 +39,24 @@
               >
               </el-input>
             </div>
+            <div v-if="marked" style="height: 30px;line-height: 30px;padding-left: 32px">问题类型:{{item.markTypeEntity.name}}</div>
             <div class="btnContainer" style="margin:10px 0;height:40px" v-if="!marked">
-              <span style="font-size:14px;float:left;margin-left:28px;padding-top: 10px">类型：{{item.markTypeEntity.name}}</span>
+              <!--<span style="font-size:14px;float:left;margin-left:28px;padding-top: 10px">类型：{{item.markTypeEntity.name}}</span>-->
               <el-button type="danger" :loading="deleteLoading" style="float:right;" @click="deleteTag(item.id)">删除</el-button>
-              <el-button type="primary" :loading="updateLoading" style="float: right;margin-right: 10px;" @click="updateTag(item.id, item)">修改</el-button>
+              <el-button type="primary" :loading="updateLoading" style="float: right;margin-right: 10px;" @click="updateTag(item.id, item, item.markTypeEntity.id)">修改</el-button>
+              <el-select v-model="item.markTypeEntity.id"
+                         @change="changeMarkType($event,item)"
+                         style="width:128px;float: right">
+                <el-option
+                  v-for="item in markTypeData"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
             </div>
+            <br>
+            <!--<div style="border-bottom: 1px dashed #ccc"></div>-->
           </div>
 
       </div>
@@ -312,8 +325,13 @@
       },
       selectedMarkType() {
         this.markTypeId = this.value
+
       },
-      getdocument () {
+      changeMarkType(changeId, item) {
+        item.markTypeEntity.id = changeId
+        // alert(changeId)
+      },
+      getdocument() {
         this.listLoading = true
         documentDetail(this.id,this.loginInfo).then(response => {
           this.document = response.data.data
@@ -365,27 +383,50 @@
       saveAllTags () {
         let questions = document.getElementsByClassName('questionContainer')
       },
-      updateTag(id, item) {
-        this.updateLoading = true
-        updateMark(id, item, this.loginInfo).then(response => {
-          this.updateLoading = false
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
+      updateTag(markId, item, changeTypeId) {
+        // alert(changeTypeId)
+        this.$confirm('确认保存修改吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.updateLoading = true
+          updateMark(markId, item, changeTypeId, this.loginInfo).then(response => {
+            this.updateLoading = false
+            this.$notify({
+              title: '成功',
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(() => {
+            this.updateLoading = false
+            this.$notify({
+              title: '失败',
+              message: '修改失败',
+              type: 'error',
+              duration: 2000
+            })
           })
         }).catch(() => {
           this.updateLoading = false
         })
       },
       deleteTag (markId) {
-        this.deleteLoading = true
-        let documentId = this.id
-        deleteMark(documentId, markId, this.loginInfo).then(response => {
-          this.deleteLoading = false
-          this.getdocument()
-          console.log('deleteSuccess')
+        this.$confirm('确认删除此条标注吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteLoading = true
+          let documentId = this.id
+          deleteMark(documentId, markId, this.loginInfo).then(response => {
+            this.deleteLoading = false
+            this.getdocument()
+            console.log('deleteSuccess')
+          }).catch(() => {
+            this.deleteLoading = false
+          })
         }).catch(() => {
           this.deleteLoading = false
         })
@@ -415,6 +456,8 @@
             }).catch(() => {
               this.commitLoading = false
             })
+          }).catch(() => {
+            this.commitLoading = false
           })
         }else{
           this.$message({

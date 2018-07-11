@@ -12,7 +12,7 @@
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <router-link to="/document/index">
+      <!--<router-link to="/document/index">-->
         <div class="card-panel" @click="handleSetLineChartData('messages')">
           <div class="card-panel-icon-wrapper icon-components1">
             <svg-icon icon-class="form" class-name="card-panel-icon" />
@@ -22,10 +22,10 @@
             <count-to class="card-panel-num" :autoplay= autoplayFlag :startVal="0" :endVal="list.marked" :duration="2600"></count-to>
           </div>
         </div>
-      </router-link>
+      <!--</router-link>-->
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <router-link to="/check/index">
+      <!--<router-link to="/check/index">-->
         <div class='card-panel' @click="handleSetLineChartData('newVisitis')">
           <div class="card-panel-icon-wrapper icon-computer">
             <svg-icon icon-class="example" class-name="card-panel-icon" />
@@ -35,20 +35,20 @@
             <count-to class="card-panel-num" :autoplay= autoplayFlag :startVal="0" :endVal="list.reviewed" :duration="2600"></count-to>
           </div>
         </div>
-      </router-link>
+      <!--</router-link>-->
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <router-link to="/conflict/index">
+      <!--<router-link to="/recheckByAdmin/index">-->
         <div class='card-panel' @click="handleSetLineChartData('newVisitis')">
           <div class="card-panel-icon-wrapper icon-computer">
             <svg-icon icon-class="conflict1" class-name="card-panel-icon" />
           </div>
           <div class="card-panel-description">
-            <div class="card-panel-text">冲突</div>
-            <count-to class="card-panel-num" :startVal="0" :endVal="conflictLength" :duration="2600"></count-to>
+            <div class="card-panel-text">待复审</div>
+            <count-to class="card-panel-num" :startVal="0" :endVal="recheckLength" :duration="2600"></count-to>
           </div>
         </div>
-      </router-link>
+      <!--</router-link>-->
     </el-col>
 
   </el-row>
@@ -57,6 +57,7 @@
 <script>
 import CountTo from 'vue-count-to'
 import { countList, conflictList } from '@/api/dashboard'
+import { getReviewedDoc } from '@/api/recheckByAdmin'
 
 export default {
   components: {
@@ -68,10 +69,18 @@ export default {
       tableKey: 0,
       list: [],
       conflictLength: 0,
+      recheckLength: 0,
       conflicts: [],
+      recheckList: [],
       userData: {
         username: '',
         password: ''
+      },
+      listQuery: {
+        page: 0,
+        size: 20,
+        limit: 5,
+        tagname: ''
       }
     }
   },
@@ -80,7 +89,7 @@ export default {
     this.userData.password = this.getCookie('password')
     this.autoplayFlag = false
     this.getList()
-    this.getConflictList()
+    this.getRecheckList()
   },
   methods: {
     handleSetLineChartData(type) {
@@ -96,9 +105,14 @@ export default {
     },
     getConflictList() {
       conflictList(this.userData).then(response => {
-        console.log(response.data.data)
         this.conflicts = response.data.data
         this.conflictLength = this.conflictsA.length
+      })
+    },
+    getRecheckList() {
+      getReviewedDoc(this.userData, this.listQuery).then(response => {
+        this.recheckList = response.data.data
+        this.recheckLength = this.recheckList.totalElements
       })
     }
   },

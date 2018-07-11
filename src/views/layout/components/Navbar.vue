@@ -30,9 +30,9 @@
             </el-upload>
 
           </el-dropdown-item>
-          <el-dropdown-item v-if="token === 'admin'" style="padding:0">
+          <!--<el-dropdown-item v-if="token === 'admin'" style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="outputVisible = true">导出</span>
-          </el-dropdown-item>
+          </el-dropdown-item>-->
           <el-dropdown-item v-if="token === 'admin'" style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="creatUserVisible = true">生成用户</span>
           </el-dropdown-item>

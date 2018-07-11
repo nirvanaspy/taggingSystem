@@ -23,9 +23,9 @@
       ])
     },
     created() {
-      console.log(this.roles, 'roles')
-      const loginName = this.getCookie('username')
-      if (loginName !== 'admin') {
+      // const loginName = this.getCookie('username')
+      const authRole = this.$store.getters.userAuth
+      if (authRole !== 'ADMIN') {
         this.currentRole = 'editorDashboard'
       }
       /*  if (!this.roles.includes('admin')) {

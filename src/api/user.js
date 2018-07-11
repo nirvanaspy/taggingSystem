@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function addUser(data) {
   return request({
-    url: 'users',
+    url: '/users',
     method: 'post',
     params: {
       isAdmin: false
@@ -10,8 +10,19 @@ export function addUser(data) {
     /* auth: {
       username: 'admin',
       password: 'admin'
-    },*/
+    }, */
     data
+  })
+}
+// 获取所有用户
+export function getUsers(loginInfo) {
+  return request({
+    url: '/users',
+    method: 'get',
+    auth: {
+      username: loginInfo.username,
+      password: loginInfo.password
+    }
   })
 }
 // 没用到

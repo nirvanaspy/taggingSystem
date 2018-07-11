@@ -38,41 +38,37 @@
 
     </el-table>
 
-    <!--<div class="pagination-container">
-      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" layout="total, sizes, prev, pager, next, jumper" :total="total">
-      </el-pagination>
-    </div>-->
-
     <el-dialog title="申请审阅" :visible.sync="dialogFormVisible" width="40%">
       <el-form ref="dataForm" :rules="applyRules" :model="temp" label-position="left" label-width="100px">
+        <el-form-item label="选择标注者">
+          <el-select v-model="userId"
+                     @change="changeSelectUser($event)"
+          >
+            <el-option
+              v-for="item in userList"
+              :key="item.id"
+              :label="item.username"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="申请数量: " prop="num">
           <el-input v-model="temp.num" style="width: 200px"></el-input>
           <div style="color:red;">{{this.errorMessage}}</div>
         </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button type="primary" :loading="applyLoading" @click="ApplyCheck">确认</el-button>
       </div>
     </el-dialog>
-    <!--<div class="paginationContainer">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="listA.length">
-      </el-pagination>
-    </div>-->
 
   </div>
 </template>
 
 <script>
-  import { documentListReview, distributionReviewDoc } from '@/api/reviewDocument.js'
+  import { documentListReview, distributionReviewDoc, disReviewDocByUser } from '@/api/reviewDocument.js'
+  import { getUsers } from '@/api/user.js'
   import waves from '@/directive/waves' // 水波纹指令
   import { isvalidNum } from '@/utils/validate'
   /* eslint-disable */
@@ -94,7 +90,8 @@
       return {
         tableKey: 0,
         list: [],
-        total: null,
+        userList: [],
+        userId: '',
         listLoading: true,
         listQuery: {
           page: 1,
@@ -164,6 +161,10 @@
         }
       },
       handleApply() {
+        this.userId = ''
+        getUsers(this.loginInfo).then((res) => {
+          this.userList = res.data.data
+        })
         this.resetTemp();
         this.dialogStatus = 'create'
         this.errorMessage = ''
@@ -174,7 +175,11 @@
           // this.getList()
         })
       },
+      changeSelectUser (id) {
+        this.userId = id
+      },
       ApplyCheck() {
+        let that = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$confirm('是否确认申请审阅的数量？', '提示', {
@@ -185,34 +190,59 @@
               this.applyLoading = true
               let formData = new FormData();
               formData.append('num', this.temp.num);
-
+              formData.append('userId', this.userId)
               //console.log(formData);
-              var that = this
-              distributionReviewDoc(formData, this.loginInfo).then(response => {
-                this.list = response.data.data;
-                this.applyLoading = false
-                //console.log(response.data)
-                console.log(response.data.data)
-                //this.list.unshift(this.temp)
-                this.dialogFormVisible = false
-                this.listLoading = false
-                this.$notify({
-                  title: '成功',
-                  message: '申请成功',
-                  type: 'success',
-                  duration: 2000
+              if (this.userId.length == 0) {
+                distributionReviewDoc(formData, this.loginInfo).then(response => {
+                  this.list = response.data.data;
+                  this.applyLoading = false
+                  //console.log(response.data)
+                  console.log(response.data.data)
+                  //this.list.unshift(this.temp)
+                  this.dialogFormVisible = false
+                  this.listLoading = false
+                  this.$notify({
+                    title: '成功',
+                    message: '申请成功',
+                    type: 'success',
+                    duration: 2000
+                  })
+                  this.getList()
+                }).catch((error) => {
+                  this.applyLoading = false
+                  if(error.response.data.status === 500){
+                    this.errorMessage = error.response.data.message
+                  }else{
+                    this.errorMessage = '请输入正确的数量'
+                    console.log('error')
+                  }
                 })
-                this.getList()
-              }).catch((error) => {
-                this.applyLoading = false
-                console.log(3222)
-                if(error.response.data.status === 500){
-                  this.errorMessage = error.response.data.message
-                }else{
-                  this.errorMessage = '请输入正确的数量'
-                  console.log('error')
-                }
-              })
+              } else {
+                disReviewDocByUser(formData, this.loginInfo).then(response => {
+                  this.list = response.data.data;
+                  this.applyLoading = false
+                  //console.log(response.data)
+                  console.log(response.data.data)
+                  //this.list.unshift(this.temp)
+                  this.dialogFormVisible = false
+                  this.listLoading = false
+                  this.$notify({
+                    title: '成功',
+                    message: '申请成功',
+                    type: 'success',
+                    duration: 2000
+                  })
+                  this.getList()
+                }).catch((error) => {
+                  this.applyLoading = false
+                  if(error.response.data.status === 500){
+                    this.errorMessage = error.response.data.message
+                  }else{
+                    this.errorMessage = '请输入正确的数量'
+                    // console.log('error')
+                  }
+                })
+              }
             })
           }
         })

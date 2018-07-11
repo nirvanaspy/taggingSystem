@@ -1,9 +1,12 @@
 <template>
   <div class="app-container calendar-list-container" style="height: 100%">
     <div class="btnContainer" id="btnContainer" style="position:relative;height:40px;">
-      <!--<el-button type="success" :loading="commitLoading" v-if="!reviewed" @click="commitTags" style="float: right">提交</el-button>
-      <el-button type="success" v-else plain style="float: right" disabled="disabled">已提交</el-button>-->
-      <router-link to="/conflict/index"><el-button type="success" style="position:absolute;right:0;">返回</el-button></router-link>
+      <span style="line-height: 40px;padding: 0 8px;font-weight: bold;">标注者：{{markUser}}</span>
+      <span style="line-height: 40px;padding: 0 8px;font-weight: bold;">审阅者：{{reviewUser}}</span>
+      <!--<el-button type="success" v-if="!reviewed" @click="commitTags" :loading="commitLoading" style="position:absolute;right:0;">提交</el-button>-->
+      <!--&lt;!&ndash;<el-button type="warning" @click="rejectDoc" :loading="commitLoading" style="position:absolute;right:80px;">驳回</el-button>-->
+      <!--<el-button type="success" @click="acceptDoc" :loading="commitLoading" style="position:absolute;right:0;">通过</el-button>-->
+      <!--<el-button type="success" v-else plain style="position:absolute;right:0;" disabled="disabled">已提交</el-button>-->
     </div>
     <div class="articleContainer" style="width:68%;float:left;overflow:hidden;padding:6px 20px 6px 6px;text-align: justify">
       <h3 style="position:relative;margin:0;padding-right:60px;">
@@ -17,15 +20,14 @@
 
       <p id="articleT" style="text-indent: 2em;line-height: 26px;font-size: 16px;">{{this.document.content}}</p>
     </div>
-    <div id="tagContainer" v-if="!loadingTag" class="tagsConatiner" style="min-width:350px;height:600px;overflow-y:scroll;float:right; border:1px solid #ccc; margin-top:8px;padding-right:10px;padding-top:10px;padding-left:4px;">
+    <div id="tagContainer" class="tagsConatiner" style="min-width:350px;height:600px;overflow-y:scroll;float:right; border:1px solid #ccc; margin-top:8px;padding-right:10px;padding-top:10px;padding-left:4px;">
       <div v-if="this.markList && this.markList.length > 0">
-        <div v-for="(item,index) in markList" v-if="item.conflict" style="margin-bottom: 10px">
+        <div v-for="(item,index) in markList" style="margin-bottom: 10px">
           <div class="questionContainer">
             <span style="width:6%;float:left;padding:4px 4px">Q<span style="font-size:12px;">{{index + 1}}</span></span>
             <el-input style="width: 94%;padding-left:10px;margin-bottom: 10px;" type="textarea"
                       :autosize="{ minRows: 1}" placeholder="添加标记"
                       v-model="item.question"
-                      disabled="disabled"
             >
             </el-input>
           </div>
@@ -37,78 +39,45 @@
             >
             </el-input>
           </div>
-          <div class="btnContainer" style="margin:10px 0;height:40px" v-if="item.conflict">
-            <el-button type="danger" style="float:right;" :loading="resolveLoading" @click="resolveMarkConflict(item.id,item.answer)">撤销</el-button>
-            <!--<el-button type="primary" style="float:right;margin-right:10px">修改</el-button>-->
-            <!--<el-button type="warning" v-if="!item.conflict" style="float:right;" @click="setConflict(item.id)">撤销</el-button>
-            <el-button type="warning" v-else disabled="disabled" style="float:right;" @click="setConflict(item.id)">修改</el-button>-->
+          <div v-if="document.accepted" style="height: 30px;line-height: 30px;padding-left: 32px;font-weight: bold">问题类型:{{item.markTypeEntity.name}}</div>
+          <!--选择问题类型和保存按钮-->
+          <!--<div class="btnContainer" style="margin:10px 0;height:40px">
+            <el-button type="primary" style="float:right;" @click="updateTag(item.id, item, item.markTypeEntity.id)">保存</el-button>
+            <el-select v-model="item.markTypeEntity.id"
+                       @change="changeMarkType($event,item)"
+                       style="float:right;width:208px;margin-right:10px;">
+              <el-option
+                v-for="item in markTypeData"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+            &lt;!&ndash;<el-button type="warning" v-if="!item.conflict" style="float:right;" :loading="conflictLoading" @click="setConflict(item.id)">冲突</el-button>
+            <el-button type="warning" v-else disabled="disabled" style="float:right;">已提交</el-button>&ndash;&gt;
+          </div>-->
+          <div>
+            <br/>
           </div>
         </div>
-
       </div>
-      <div class="inputContainer" style="margin-bottom: 10px" v-if="!marked">
-        <div class="questionContainer">
-          <span style="width:6%;float:left;padding:4px 4px">Q:</span>
-          <el-input style="width: 94%;padding-left:10px;margin-bottom: 10px;" type="textarea"
-                    :autosize="{ minRows: 1}" placeholder="添加标记"
-                    v-model="input1.question"
-          >
-          </el-input>
-        </div>
-        <div class="answerContainer">
-          <span style="width:6%;float:left;padding:4px 4px">A:</span>
-          <el-input style="width: 94%;padding-left:10px" type="textarea"
-                    :autosize="{ minRows: 2}" placeholder="添加答案"
-                    v-model="input1.answer"
-          >
-          </el-input>
-        </div>
-      </div>
-      <!-- <div class="inputContainer" style="margin-bottom: 10px">
-         <div class="questionContainer">
-           <span style="float:left;padding:4px 4px">Q:</span>
-           <el-input style="width: 85%;margin:0 0 10px 10px" type="textarea"
-                     :autosize="{ minRows: 1}" placeholder="添加标记">
-           </el-input>
-         </div>
-         <div class="answerContainer">
-           <span style="float:left;padding:4px 4px">A:</span>
-           <el-input style="width: 85%;margin-left: 10px" type="textarea"
-                     :autosize="{ minRows: 2}" placeholder="添加答案">
-           </el-input>
-         </div>
-       </div>
-       <div class="inputContainer" style="margin-bottom: 10px">
-         <div class="questionContainer">
-           <span style="float:left;padding:4px 4px">Q:</span>
-           <el-input style="width: 85%;margin:0 0 10px 10px" type="textarea"
-                     :autosize="{ minRows: 1}" placeholder="添加标记">
-           </el-input>
-         </div>
-         <div class="answerContainer">
-           <span style="float:left;padding:4px 4px">A:</span>
-           <el-input style="width: 85%;margin-left: 10px" type="textarea"
-                     :autosize="{ minRows: 2}" placeholder="添加答案">
-           </el-input>
-         </div>
-       </div>-->
     </div>
   </div>
 </template>
 
 <script>
-  import { documentDetail } from '@/api/tagdocument'
+  import { documentDetail, updateMark } from '@/api/tagdocument'
   import { markConflict, commitReview } from '@/api/reviewDocument.js'
-  import { resolveConflicts } from '@/api/conflicts'
+  import { rejectDocument, acceptDocument } from '@/api/recheckByAdmin'
+  import { markType } from '@/api/markType'
 
   /* eslint-disable */
   export default {
-    name: 'tag',
+    name: 'acceptDocDetail',
     data() {
       return {
         tableKey: 0,
         id: '',
-        cId: '',
         document: {},
         marked: false,
         reviewed: false,
@@ -128,8 +97,13 @@
           password: ''
         },
         loadingTag:true,
-        resolveLoading: false,
-        commitLoading: false
+        conflictLoading: false,
+        commitLoading: false,
+        markUser: '',
+        reviewUser: '',
+        markTypeData: null,
+        value: '',
+        markTypeId: ''
       }
     },
     created() {
@@ -138,9 +112,8 @@
       this.loginInfo.username = this.getCookie('username')
       this.loginInfo.password = this.getCookie('password')
       this.id = this.$route.params.id
-      alert(this.id)
-      this.cId = this.$route.params.cId
       this.getdocument()
+      // this.getMarkType()
       if (this.getCookie('pfontSize')) {
         this.pFontSize = this.getCookie('pfontSize')
       }
@@ -180,16 +153,31 @@
           this.newList = this.oldList.slice()
         })
       },*/
+      getMarkType() {
+        markType(this.loginInfo).then((res) => {
+          this.markTypeData = res.data.data
+          for(var i=0; i<this.markTypeData.length; i++) {
+            if(this.markTypeData[i].name === '事实型问题') {
+              this.valueDefault = this.markTypeData[i].id
+              this.value = this.valueDefault
+              this.markTypeId = this.value
+            }
+          }
+        })
+      },
+      selectedMarkType() {
+        this.markTypeId = this.value
+      },
       getdocument () {
         this.listLoading = true
         documentDetail(this.id,this.loginInfo).then(response => {
+          this.markUser = response.data.data.markUser.username
+          this.reviewUser = response.data.data.reviewUser.username
           this.document = response.data.data
           this.marked= this.document.marked
           this.reviewed = this.document.reviewed
           this.markList = response.data.data.markEntityList
           this.loadingTag = false
-          console.log(this.markList)
-          console.log(this.document)
           this.loading = false
         })
       },
@@ -205,9 +193,13 @@
       },
       setConflict (markId) {
         let documentId = this.id
+        this.conflictLoading = true
         markConflict(documentId, markId, this.loginInfo).then(response => {
+          this.conflictLoading = false
           this.getdocument()
           console.log('deleteSuccess')
+        }).catch(() => {
+          this.conflictLoading = false
         })
       },
       commitTags() {
@@ -218,26 +210,15 @@
         }).then(() => {
           this.commitLoading = true
           commitReview(this.id, this.loginInfo).then(response => {
+            this.commitLoading = false
             this.$message({
               message: '提交成功',
               type: 'success'
             });
-            this.commitLoading = false
             this.$router.replace('/check/index')
           }).catch(() => {
             this.commitLoading = false
           })
-        })
-      },
-      resolveMarkConflict (mId, answers) {
-        this.resolveLoading = true
-        console.log(this.cId,'thiscid')
-        resolveConflicts(this.cId, mId, answers, this.loginInfo).then(() => {
-          this.getdocument()
-          this.resolveLoading = false
-          console.log('resolvesuccess')
-        }).catch(() => {
-          this.resolveLoading = false
         })
       },
       setFontSize (x) {
@@ -250,6 +231,71 @@
            } else {
              pWords.style.lineHeight = '24px'
            }*/
+      },
+      changeMarkType(changeId, item) {
+        item.markTypeEntity.id = changeId
+        // alert(changeId)
+      },
+      updateTag(markId, item, changeTypeId) {
+        // alert(changeTypeId)
+        this.updateLoading = true
+        updateMark(markId, item, changeTypeId, this.loginInfo).then(response => {
+          this.updateLoading = false
+          this.$notify({
+            title: '成功',
+            message: '修改成功',
+            type: 'success',
+            duration: 2000
+          })
+        }).catch(() => {
+          this.updateLoading = false
+        })
+      },
+      rejectDoc() {
+        this.$confirm('确认驳回此文章吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.commitLoading = true
+          rejectDocument(this.id, this.loginInfo).then(response => {
+            this.commitLoading = false
+            this.$message({
+              message: '驳回成功',
+              type: 'success'
+            });
+            this.$router.replace('/recheckByAdmin/index')
+          }).catch(() => {
+            this.commitLoading = false
+            this.$message({
+              message: '驳回失败',
+              type: 'error'
+            });
+          })
+        })
+      },
+      acceptDoc() {
+        this.$confirm('确认通过此文章吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.commitLoading = true
+          acceptDocument(this.id, this.loginInfo).then(response => {
+            this.commitLoading = false
+            this.$message({
+              message: '通过成功',
+              type: 'success'
+            });
+            this.$router.replace('/recheckByAdmin/index')
+          }).catch(() => {
+            this.commitLoading = false
+            this.$message({
+              message: '通过失败',
+              type: 'error'
+            });
+          })
+        })
       }
     }
   }

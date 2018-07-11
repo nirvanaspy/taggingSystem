@@ -12,6 +12,20 @@ export function distributionReviewDoc(data, loginInfo) {
     data
   })
 }
+
+// 按用户申请审阅文章
+export function disReviewDocByUser(data, loginInfo) {
+  return request({
+    url: 'documents/distribution/reviewByuser',
+    method: 'post',
+    auth: {
+      username: loginInfo.username,
+      password: loginInfo.password
+    },
+    data
+  })
+}
+
 // 获取审阅文档
 export function documentListReview(listQuery, loginInfo) {
   return request({

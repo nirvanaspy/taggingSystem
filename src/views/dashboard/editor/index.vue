@@ -24,8 +24,16 @@ export default {
   components: { PanThumb },
   data() {
     return {
-      emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
+      emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3',
+      userData: {
+        username: '',
+        password: ''
+      }
     }
+  },
+  created() {
+    this.userData.username = this.getCookie('username')
+    this.userData.password = this.getCookie('password')
   },
   computed: {
     ...mapGetters([
