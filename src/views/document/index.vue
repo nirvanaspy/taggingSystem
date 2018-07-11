@@ -54,6 +54,18 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[20,50,100]"
+      :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="this.total"
+      background
+      style="text-align: center;margin-top:20px"
+    >
+    </el-pagination>
     <el-dialog title="申请标注" :visible.sync="dialogFormVisible" width="40%">
       <el-form ref="dataForm" :rules="applyRules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="申请数量: " prop="num">
@@ -96,7 +108,8 @@
         total: null,
         listLoading: true,
         listQuery: {
-          page: 1,
+          page: 0,
+          size:20,
           limit: 5,
           tagname: ''
         },
@@ -185,14 +198,14 @@
       getList() {
         this.listLoading = true
         documentList(this.listQuery,this.loginInfo).then(response => {
-          this.list = response.data.data
+          this.list = response.data.data.content
+          this.total = response.data.data.totalElements
           /*let dataList = response.data.data
           for(var i = 0; i < dataList.length; i++ ) {
             if (dataList[i].marked == false){
               this.listNotMark.push(dataList[i])
             }
           }*/
-          this.total = response.data.total
           this.listLoading = false
           this.oldList = this.list.map(v => v.id);
           this.newList = this.oldList.slice()
@@ -202,14 +215,14 @@
         return row.marked === value;
       },
       handleSizeChange(val) {
-        this.listQuery.limit = val
+        this.listQuery.size = val
         this.pagesize = val
-        // this.getList()
+        this.getList()
       },
       handleCurrentChange(val) {
-        this.listQuery.page = val
+        this.listQuery.page = val - 1
         this.currentPage = val
-        // this.getList()
+        this.getList()
       },
       resetTemp() {
         this.temp = {

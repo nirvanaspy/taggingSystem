@@ -37,7 +37,18 @@
       </el-table-column>
 
     </el-table>
-
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[20,50,100]"
+      :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="this.total"
+      background
+      style="text-align: center;margin-top:20px"
+    >
+    </el-pagination>
     <el-dialog title="申请审阅" :visible.sync="dialogFormVisible" width="40%">
       <el-form ref="dataForm" :rules="applyRules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="选择标注者">
@@ -62,7 +73,6 @@
         <el-button type="primary" :loading="applyLoading" @click="ApplyCheck">确认</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -94,7 +104,8 @@
         userId: '',
         listLoading: true,
         listQuery: {
-          page: 1,
+          page: 0,
+          size:20,
           limit: 5,
           tagname: ''
         },
@@ -134,8 +145,8 @@
       getList() {
         this.listLoading = true
         documentListReview(this.listQuery,this.loginInfo).then(response => {
-          this.list = response.data.data
-          this.total = response.data.total
+          this.list = response.data.data.content
+          this.total = response.data.data.totalElements
           this.listLoading = false
           this.oldList = this.list.map(v => v.id);
           this.newList = this.oldList.slice()
@@ -145,14 +156,14 @@
         return row.reviewed === value;
       },
       handleSizeChange(val) {
-        this.listQuery.limit = val
+        this.listQuery.size = val
         this.pagesize = val
-        // this.getList()
+        this.getList()
       },
       handleCurrentChange(val) {
-        this.listQuery.page = val
+        this.listQuery.page = val - 1
         this.currentPage = val
-        // this.getList()
+        this.getList()
       },
       resetTemp() {
         this.temp = {

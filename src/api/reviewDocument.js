@@ -32,7 +32,9 @@ export function documentListReview(listQuery, loginInfo) {
     url: 'documents/review',
     params: {
       userId: '',
-      isReviewed: false
+      isReviewed: false,
+      size: listQuery.size,
+      page: listQuery.page
     },
     method: 'get',
     auth: {

@@ -5,7 +5,9 @@ export function documentList(listQuery, loginInfo) {
     url: 'documents/mark',
     params: {
       userId: '',
-      isMarked: false
+      isMarked: false,
+      size: listQuery.size,
+      page: listQuery.page
     },
     method: 'get',
     auth: {

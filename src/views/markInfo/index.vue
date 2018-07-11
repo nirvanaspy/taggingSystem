@@ -23,32 +23,32 @@
         </el-table-column>-->
         <el-table-column label="事实型问题" prop="markNum">
           <template slot-scope="scope">
-            <span>{{scope.row.factNum}}</span>
+            <span>{{Math.round(scope.row.factNum*1000)/10}}%</span>
           </template>
         </el-table-column>
         <el-table-column label="列表型问题" prop="markFinishedNum">
           <template slot-scope="scope">
-            <span>{{scope.row.listNum}}</span>
+            <span>{{Math.round(scope.row.listNum*1000)/10}}%</span>
           </template>
         </el-table-column>
         <el-table-column label="数值型问题" prop="reviewNum">
           <template slot-scope="scope">
-            <span>{{scope.row.numNum}}</span>
+            <span>{{Math.round(scope.row.numNum*1000)/10}}%</span>
           </template>
         </el-table-column>
         <el-table-column label="定义型问题" prop="reviewFinishedNum">
           <template slot-scope="scope">
-            <span>{{scope.row.defineNum}}</span>
+            <span>{{Math.round(scope.row.defineNum*1000)/10}}%</span>
           </template>
         </el-table-column>
         <el-table-column label="观点型问题" prop="reviewFinishedNum">
           <template slot-scope="scope">
-            <span>{{scope.row.pointNum}}</span>
+            <span>{{Math.round(scope.row.pointNum*1000)/10}}%</span>
           </template>
         </el-table-column>
         <el-table-column label="篇章型问题" prop="reviewFinishedNum">
           <template slot-scope="scope">
-            <span>{{scope.row.articleNum}}</span>
+            <span>{{Math.round(scope.row.articleNum*1000)/10}}%</span>
           </template>
         </el-table-column>
       </el-table>
