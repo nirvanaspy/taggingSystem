@@ -266,6 +266,8 @@
               }).catch(() => {
                 this.applyLoading = false
               })
+            }).catch(() => {
+              this.applyLoading = false
             })
           }
         })

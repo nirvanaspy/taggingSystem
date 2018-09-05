@@ -1,4 +1,46 @@
 import request from '@/utils/request'
+// 申请复审文章
+export function distributionRecheckDoc(data, loginInfo) {
+  return request({
+    url: '/documents/distribution/accept/',
+    method: 'post',
+    auth: {
+      username: loginInfo.username,
+      password: loginInfo.password
+    },
+    data
+  })
+}
+
+// 按用户申请复审文章
+export function disRecheckDocByUser(data, loginInfo) {
+  return request({
+    url: 'documents/distribution/acceptByUser',
+    method: 'post',
+    auth: {
+      username: loginInfo.username,
+      password: loginInfo.password
+    },
+    data
+  })
+}
+
+export function getDocByUser(loginInfo, listQuery) {
+  return request({
+    url: '/documents/accept',
+    params: {
+      userId: '',
+      isAccepted: false,
+      size: listQuery.size,
+      page: listQuery.page
+    },
+    method: 'get',
+    auth: {
+      username: loginInfo.username,
+      password: loginInfo.password
+    }
+  })
+}
 
 export function getReviewedDoc(loginInfo, listQuery) {
   return request({
@@ -31,7 +73,7 @@ export function rejectDocument(id, loginInfo) {
 
 export function acceptDocument(id, loginInfo) {
   return request({
-    url: '/documents/' + id + '/accept',
+    url: '/documents/' + id + '/accept/release',
     method: 'put',
     auth: {
       username: loginInfo.username,

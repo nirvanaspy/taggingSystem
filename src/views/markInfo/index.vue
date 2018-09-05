@@ -21,32 +21,32 @@
             <span>{{scope.row.title}}</span>
           </template>
         </el-table-column>-->
-        <el-table-column label="事实型问题" prop="markNum">
+        <el-table-column label="事实型问题" prop="factNum">
           <template slot-scope="scope">
             <span>{{Math.round(scope.row.factNum*1000)/10}}%</span>
           </template>
         </el-table-column>
-        <el-table-column label="列表型问题" prop="markFinishedNum">
+        <el-table-column label="列表型问题" prop="listNum">
           <template slot-scope="scope">
             <span>{{Math.round(scope.row.listNum*1000)/10}}%</span>
           </template>
         </el-table-column>
-        <el-table-column label="数值型问题" prop="reviewNum">
+        <el-table-column label="数值型问题" prop="numNum">
           <template slot-scope="scope">
             <span>{{Math.round(scope.row.numNum*1000)/10}}%</span>
           </template>
         </el-table-column>
-        <el-table-column label="定义型问题" prop="reviewFinishedNum">
+        <el-table-column label="定义型问题" prop="defineNum">
           <template slot-scope="scope">
             <span>{{Math.round(scope.row.defineNum*1000)/10}}%</span>
           </template>
         </el-table-column>
-        <el-table-column label="观点型问题" prop="reviewFinishedNum">
+        <el-table-column label="观点型问题" prop="pointNum">
           <template slot-scope="scope">
             <span>{{Math.round(scope.row.pointNum*1000)/10}}%</span>
           </template>
         </el-table-column>
-        <el-table-column label="篇章型问题" prop="reviewFinishedNum">
+        <el-table-column label="篇章型问题" prop="articleNum">
           <template slot-scope="scope">
             <span>{{Math.round(scope.row.articleNum*1000)/10}}%</span>
           </template>
@@ -76,15 +76,15 @@
           paramData: [
             {
               id: 0,
-              title: '已标注'
+              title: '标注完成'
             },
             {
               id: 1,
-              title: '已审阅'
+              title: '审阅完成'
             },
             {
               id: 2,
-              title: '已通过'
+              title: '通过完成'
             }
           ]
         }
@@ -100,6 +100,14 @@
           getMarkTypeInfo(this.loginInfo, param).then((res) => {
             this.listLoading = false
             this.list = [res.data.data]
+          }).catch((err) => {
+            if(err.response.data.status == 500) {
+              this.listLoading = false
+              this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
+            }
           })
 
         },
@@ -126,6 +134,7 @@
               isAccepted: true
             }
           }
+          this.list = []
           this.getList(params)
         }
       }

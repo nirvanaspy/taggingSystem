@@ -30,9 +30,9 @@
             </el-upload>
 
           </el-dropdown-item>
-          <!--<el-dropdown-item v-if="token === 'admin'" style="padding:0">
+          <el-dropdown-item v-if="token === 'admin'" style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="outputVisible = true">导出</span>
-          </el-dropdown-item>-->
+          </el-dropdown-item>
           <el-dropdown-item v-if="token === 'admin'" style="padding:0">
             <span style="display:block;padding: 0 15px;" @click="creatUserVisible = true">生成用户</span>
           </el-dropdown-item>
@@ -203,12 +203,12 @@ export default {
       uploadLength: 0,
       fileTypeOptions: [
         {
-          value: 'json',
-          label: 'JSON'
+          value: 'trainning',
+          label: '训练集'
         },
         {
-          value: 'xml',
-          label: 'XML'
+          value: 'testing',
+          label: '测试集'
         }
       ],
       isAdminOptions: [

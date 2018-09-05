@@ -67,7 +67,7 @@
   import waves from '@/directive/waves' // 水波纹指令
   /* eslint-disable */
   export default {
-    name: 'recheck',
+    name: 'acceptedDoc',
     directives: {
       waves
     },

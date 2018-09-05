@@ -50,27 +50,27 @@
                 style="width: 100%"
       >
 
-        <el-table-column label="用户名" min-width="100">
+        <el-table-column label="用户名" min-width="100" prop="username" sortable>
           <template slot-scope="scope">
             <span>{{scope.row.userEntity.username}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="申请标注数">
+        <el-table-column label="申请标注数" prop="markNum" sortable>
           <template slot-scope="scope">
             <span>{{scope.row.markNum}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="完成标注数">
+        <el-table-column label="完成标注数" prop="markFinishedNum" sortable>
           <template slot-scope="scope">
             <span>{{scope.row.markFinishedNum}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="申请审阅数">
+        <el-table-column label="申请审阅数" prop="reviewNum" sortable>
           <template slot-scope="scope">
             <span>{{scope.row.reviewNum}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="完成审阅数">
+        <el-table-column label="完成审阅数" prop="reviewFinishedNum" sortable>
           <template slot-scope="scope">
             <span>{{scope.row.reviewFinishedNum}}</span>
           </template>

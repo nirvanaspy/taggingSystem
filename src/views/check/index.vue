@@ -54,6 +54,7 @@
         <el-form-item label="选择标注者">
           <el-select v-model="userId"
                      @change="changeSelectUser($event)"
+                     filterable
           >
             <el-option
               v-for="item in userList"
@@ -188,6 +189,7 @@
       },
       changeSelectUser (id) {
         this.userId = id
+        this.errorMessage = ''
       },
       ApplyCheck() {
         let that = this

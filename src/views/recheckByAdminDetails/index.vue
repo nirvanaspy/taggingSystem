@@ -131,7 +131,7 @@
 
   /* eslint-disable */
   export default {
-    name: 'recheckDetail',
+    name: 'recheckByAdminDetails',
     data() {
       return {
         tableKey: 0,
